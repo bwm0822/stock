@@ -100,7 +100,7 @@
   .range-buttons button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 
   .chart-wrap { position: relative; padding: 16px 16px 6px; }
-  svg.chart { display: block; width: 100%; height: auto; overflow: visible; }
+  svg.chart { display: block; width: 100%; max-width: 100%; height: auto; overflow: visible; }
   .gridline { stroke: var(--grid); stroke-width: 1; }
   .baseline { stroke: var(--baseline); stroke-width: 1; }
   .panel-label { fill: var(--muted); font-size: 10px; font-family: 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: 0.04em; }
@@ -136,12 +136,39 @@
   }
   thead th:first-child, tbody td:first-child { text-align: left; }
   tbody td { padding: 7px 12px; text-align: right; border-bottom: 1px solid var(--grid); font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tbody tr { cursor: pointer; }
   tbody tr:hover { background: var(--chip-bg); }
   td.date-cell { font-family: 'Manrope', sans-serif; font-weight: 600; }
   td.up { color: var(--up); }
   td.down { color: var(--down); }
 
   footer.note { font-size: 11.5px; color: var(--muted); padding: 2px 2px; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(11,11,11,0.5);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.12s;
+  }
+  .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+  .modal-panel {
+    background: var(--surface); border-radius: 16px; border: 1px solid var(--border);
+    width: 100%; max-width: 620px; max-height: 88vh;
+    overflow-x: hidden; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .modal-head h2 { font-size: 15px; margin: 0; font-weight: 800; }
+  .modal-close {
+    background: transparent; border: 1px solid var(--border); border-radius: 8px;
+    width: 28px; height: 28px; cursor: pointer; color: var(--ink-2); font-size: 15px; line-height: 1;
+  }
+  .modal-close:hover { background: var(--chip-bg); }
+  .modal-stats { display: flex; gap: 8px 16px; padding: 12px 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); border-bottom: 1px solid var(--border); }
+  .modal-stats b { font-family: 'IBM Plex Mono', ui-monospace, monospace; color: var(--ink); font-weight: 700; }
+  .modal-stats .up b, .modal-stats.up b { color: var(--up); }
+  .modal-stats .down b, .modal-stats.down b { color: var(--down); }
+  .modal-chart-wrap { position: relative; padding: 14px 16px 6px; }
+  .modal-empty { padding: 40px 18px; text-align: center; color: var(--muted); font-size: 13px; }
 
   @media (max-width: 480px) {
     .range-row { flex-direction: column; align-items: stretch; }
@@ -221,9 +248,23 @@
   </div>
 
   <footer class="note">
-    資料來源:凱基證券 API(日K)· output/6547_daily.csv · 台股慣例:紅漲綠跌
+    資料來源:凱基證券 API(日K)· output/6547_daily.csv · 台股慣例:紅漲綠跌 · 點擊表格任一列可看當日分鐘走勢
   </footer>
 
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <h2 id="modalTitle">當日走勢</h2>
+      <button class="modal-close" id="modalClose" aria-label="關閉" type="button">✕</button>
+    </div>
+    <div class="modal-stats" id="modalStats"></div>
+    <div class="modal-chart-wrap" id="modalChartWrap">
+      <svg class="chart" id="dayChart" viewBox="0 0 560 220" preserveAspectRatio="none" role="img" aria-label="當日分鐘走勢圖"></svg>
+      <div class="tooltip" id="dayTooltip"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -328,7 +369,7 @@
     var html = '';
     for (var i = rows.length - 1; i >= 0; i--) {
       var r = rows[i];
-      html += '<tr>' +
+      html += '<tr data-date="' + r.date + '" title="查看 ' + r.date + ' 分鐘走勢">' +
         '<td class="date-cell">' + r.date + '</td>' +
         '<td>' + fmt(r.open, 1) + '</td>' +
         '<td>' + fmt(r.high, 1) + '</td>' +
@@ -348,6 +389,19 @@
     var e = document.createElementNS(NS, tag);
     for (var k in attrs) e.setAttribute(k, attrs[k]);
     return e;
+  }
+
+  // Tooltip is horizontally centered on `desiredLeft` via translate(-50%, ...),
+  // so near either edge of `containerWidth` it can get clipped by an
+  // overflow:hidden ancestor. Clamp the center point so the box always stays
+  // fully inside [margin, containerWidth - margin].
+  function clampedTooltipLeft(tooltip, desiredLeft, containerWidth) {
+    var margin = 6;
+    var half = (tooltip.offsetWidth || 140) / 2;
+    var min = margin + half;
+    var max = containerWidth - margin - half;
+    if (max < min) return containerWidth / 2;
+    return Math.max(min, Math.min(max, desiredLeft));
   }
 
   function renderChart(rows) {
@@ -481,10 +535,8 @@
       hoverCol.setAttribute('width', slotW);
       hoverCol.style.opacity = 0.05;
 
-      var tipLeft = rect.left + (px / W) * rect.width - rect.left;
-      var tipTop = rect.top + (priceTop / 300) * rect.height - rect.top;
-      tooltip.style.left = tipLeft + 'px';
-      tooltip.style.top = tipTop + 'px';
+      var tipLeft = (px / W) * rect.width;
+      var tipTop = (priceTop / 300) * rect.height;
       tooltip.style.opacity = 1;
       tooltip.innerHTML =
         '<div class="t-date">' + r.date + '</div>' +
@@ -495,6 +547,8 @@
         '<div class="t-row"><span>漲跌幅</span><span>' + pct(r.changePct) + '</span></div>' +
         '<div class="t-row"><span>成交量</span><span>' + fmtInt(r.volume) + ' 張</span></div>' +
         '<div class="t-row"><span>總振幅</span><span>' + pct(r.totalAmp) + '</span></div>';
+      tooltip.style.left = clampedTooltipLeft(tooltip, tipLeft, rect.width) + 'px';
+      tooltip.style.top = tipTop + 'px';
     }
     function onLeave() {
       crosshair.style.opacity = 0;
@@ -505,6 +559,187 @@
     catcher.onmouseleave = onLeave;
     catcher.ontouchmove = function (e) { onMove(e); e.preventDefault(); };
     catcher.ontouchend = onLeave;
+  }
+
+  // ---- Intraday drill-down (click a table row -> that day's minute chart) ----
+
+  var minuteCache = null; // Promise -> { 'yyyy-mm-dd': [{hhmm,open,high,low,close,volume}, ...] }
+
+  function loadMinuteData() {
+    if (minuteCache) return minuteCache;
+    minuteCache = fetch('output/6547_minute.csv')
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function (text) {
+        function clean(s) { return s.replace(/^"|"$/g, ''); }
+        var lines = text.trim().split(/\r?\n/);
+        var headers = lines[0].split(',').map(clean);
+        function ci(name) {
+          var i = headers.indexOf(name);
+          if (i === -1) throw new Error('找不到欄位: ' + name);
+          return i;
+        }
+        var iDate = ci('日期'), iHHMM = ci('hhmm'), iOpen = ci('開盤價'),
+            iHigh = ci('最高價'), iLow = ci('最低價'), iClose = ci('收盤價'), iVol = ci('成交量');
+        var map = {};
+        for (var i = 1; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          var p = lines[i].split(',').map(clean);
+          var d = p[iDate];
+          if (!map[d]) map[d] = [];
+          map[d].push({
+            hhmm: p[iHHMM],
+            open: parseFloat(p[iOpen]), high: parseFloat(p[iHigh]),
+            low: parseFloat(p[iLow]), close: parseFloat(p[iClose]),
+            volume: parseFloat(p[iVol])
+          });
+        }
+        for (var d2 in map) map[d2].sort(function (a, b) { return a.hhmm.localeCompare(b.hhmm); });
+        return map;
+      });
+    return minuteCache;
+  }
+
+  function hhmmLabel(hhmm) { return hhmm.slice(0, 2) + ':' + hhmm.slice(2); }
+
+  function renderDayChart(dayRows) {
+    var wrap = document.getElementById('modalChartWrap');
+    wrap.innerHTML = '<svg class="chart" id="dayChart" viewBox="0 0 560 220" preserveAspectRatio="none" role="img" aria-label="當日分鐘走勢圖"></svg><div class="tooltip" id="dayTooltip"></div>';
+    var svg = document.getElementById('dayChart');
+    var W = 560, H = 220, padL = 46, padR = 8, padT = 8, padB = 22;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var closes = dayRows.map(function (r) { return r.close; });
+    var yMax = Math.max.apply(null, closes), yMin = Math.min.apply(null, closes);
+    var pad = (yMax - yMin) * 0.12 || Math.max(0.5, yMax * 0.01);
+    yMax += pad; yMin -= pad;
+
+    function x(i) { return padL + (dayRows.length === 1 ? plotW / 2 : (i / (dayRows.length - 1)) * plotW); }
+    function y(v) { return padT + (1 - (v - yMin) / (yMax - yMin)) * plotH; }
+
+    var steps = 4;
+    for (var s = 0; s <= steps; s++) {
+      var v = yMin + (yMax - yMin) * (s / steps);
+      var yy = y(v);
+      svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: yy, y2: yy, class: 'gridline' }));
+      var t = el('text', { x: padL - 8, y: yy + 3.5, 'text-anchor': 'end', class: 'axis-label' });
+      t.textContent = v.toFixed(2);
+      svg.appendChild(t);
+    }
+    svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: padT + plotH, y2: padT + plotH, class: 'baseline' }));
+
+    var labelCount = Math.min(6, dayRows.length);
+    for (var li = 0; li < labelCount; li++) {
+      var idx = Math.round((li / Math.max(1, labelCount - 1)) * (dayRows.length - 1));
+      var t2 = el('text', {
+        x: x(idx), y: H - 6,
+        'text-anchor': li === 0 ? 'start' : (li === labelCount - 1 ? 'end' : 'middle'),
+        class: 'axis-label'
+      });
+      t2.textContent = hhmmLabel(dayRows[idx].hhmm);
+      svg.appendChild(t2);
+    }
+
+    // open-price reference line
+    var openY = y(dayRows[0].open);
+    svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: openY, y2: openY, class: 'last-close-line' }));
+
+    var pts = dayRows.map(function (r, i) { return x(i) + ',' + y(r.close); });
+    svg.appendChild(el('path', {
+      d: 'M ' + pts.join(' L '), fill: 'none',
+      style: 'stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round'
+    }));
+
+    var crosshair = el('line', { x1: padL, x2: padL, y1: padT, y2: padT + plotH, class: 'crosshair-x' });
+    svg.appendChild(crosshair);
+    var dot = el('circle', { r: 4, style: 'fill:var(--accent);stroke:var(--surface);stroke-width:2', opacity: 0 });
+    svg.appendChild(dot);
+    var catcher = el('rect', { x: 0, y: 0, width: W, height: H, fill: 'transparent' });
+    svg.appendChild(catcher);
+
+    var tooltip = document.getElementById('dayTooltip');
+    function onMove(evt) {
+      var rect = svg.getBoundingClientRect();
+      var clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+      var relX = (clientX - rect.left) / rect.width * W;
+      var idx2 = Math.round(((relX - padL) / plotW) * (dayRows.length - 1));
+      idx2 = Math.max(0, Math.min(dayRows.length - 1, idx2));
+      var r = dayRows[idx2], px = x(idx2), py = y(r.close);
+      crosshair.setAttribute('x1', px); crosshair.setAttribute('x2', px); crosshair.style.opacity = 1;
+      dot.setAttribute('cx', px); dot.setAttribute('cy', py); dot.style.opacity = 1;
+      tooltip.style.opacity = 1;
+      tooltip.innerHTML =
+        '<div class="t-date">' + hhmmLabel(r.hhmm) + '</div>' +
+        '<div class="t-row"><span>成交</span><span>' + fmt(r.close, 2) + '</span></div>' +
+        '<div class="t-row"><span>成交量</span><span>' + fmtInt(r.volume) + ' 張</span></div>';
+      tooltip.style.left = clampedTooltipLeft(tooltip, (px / W) * rect.width, rect.width) + 'px';
+      tooltip.style.top = ((py / H) * rect.height) + 'px';
+    }
+    function onLeave() { crosshair.style.opacity = 0; dot.style.opacity = 0; tooltip.style.opacity = 0; }
+    catcher.onmousemove = onMove;
+    catcher.onmouseleave = onLeave;
+    catcher.ontouchmove = function (e) { onMove(e); e.preventDefault(); };
+    catcher.ontouchend = onLeave;
+  }
+
+  function openDayModal(date) {
+    var backdrop = document.getElementById('modalBackdrop');
+    document.getElementById('modalTitle').textContent = date + ' 分鐘走勢';
+    var statsEl = document.getElementById('modalStats');
+    statsEl.innerHTML = '<span>載入中…</span>';
+    document.getElementById('modalChartWrap').innerHTML =
+      '<svg class="chart" id="dayChart" viewBox="0 0 560 220" preserveAspectRatio="none"></svg><div class="tooltip" id="dayTooltip"></div>';
+    backdrop.classList.add('open');
+
+    loadMinuteData().then(function (map) {
+      var dayRows = map[date];
+      if (!dayRows || !dayRows.length) {
+        document.getElementById('modalChartWrap').innerHTML =
+          '<div class="modal-empty">output/6547_minute.csv 沒有 ' + date + ' 這天的分鐘資料(分鐘資料只涵蓋部分近期區間)</div>';
+        statsEl.innerHTML = '';
+        return;
+      }
+      var dOpen = dayRows[0].open;
+      var dClose = dayRows[dayRows.length - 1].close;
+      var dHigh = Math.max.apply(null, dayRows.map(function (r) { return r.high; }));
+      var dLow = Math.min.apply(null, dayRows.map(function (r) { return r.low; }));
+      var dVol = dayRows.reduce(function (s, r) { return s + (r.volume || 0); }, 0);
+      var chg = dOpen ? (dClose - dOpen) / dOpen * 100 : NaN;
+      statsEl.innerHTML =
+        '<span>開盤 <b>' + fmt(dOpen, 2) + '</b></span>' +
+        '<span>最高 <b>' + fmt(dHigh, 2) + '</b></span>' +
+        '<span>最低 <b>' + fmt(dLow, 2) + '</b></span>' +
+        '<span>收盤 <b>' + fmt(dClose, 2) + '</b></span>' +
+        '<span class="' + signClass(chg) + '">漲跌 <b>' + pct(chg) + '</b></span>' +
+        '<span>成交量 <b>' + fmtInt(dVol) + '</b> 張</span>';
+      renderDayChart(dayRows);
+    }).catch(function (err) {
+      document.getElementById('modalChartWrap').innerHTML =
+        '<div class="modal-empty">讀取 output/6547_minute.csv 失敗:' + err + '</div>';
+      statsEl.innerHTML = '';
+    });
+  }
+
+  function closeDayModal() {
+    document.getElementById('modalBackdrop').classList.remove('open');
+  }
+
+  function initModal() {
+    document.getElementById('tableBody').addEventListener('click', function (e) {
+      var tr = e.target.closest('tr');
+      if (!tr) return;
+      var date = tr.getAttribute('data-date');
+      if (date) openDayModal(date);
+    });
+    document.getElementById('modalClose').addEventListener('click', closeDayModal);
+    document.getElementById('modalBackdrop').addEventListener('click', function (e) {
+      if (e.target.id === 'modalBackdrop') closeDayModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDayModal();
+    });
   }
 
   function render() {
@@ -539,6 +774,7 @@
     .then(function (text) {
       state.rows = parseCSV(text);
       initRangeButtons();
+      initModal();
       render();
       window.addEventListener('resize', render);
     })
