@@ -8,7 +8,6 @@ dll/
 
 # Generated data / output (reproducible via the scripts)
 output/
-6547_daily_chart.html
 
 # Credentials (never commit these)
 kgi.txt
