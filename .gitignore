@@ -1,0 +1,24 @@
+# Python virtual environment
+.venv/
+__pycache__/
+*.pyc
+
+# Vendor DLLs (KGI proprietary binaries - obtain from KGI's official API portal)
+dll/
+
+# Generated data / output (reproducible via the scripts)
+output/
+6547_daily_chart.html
+
+# Credentials (never commit these)
+kgi.txt
+account.txt
+
+# Auto-downloaded by kgisuperpy on login, no useful content
+errMsg.ini
+
+# Personal working notes
+doc.txt
+
+# Session logs
+*.log
