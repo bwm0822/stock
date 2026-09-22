@@ -12,7 +12,7 @@ and return this account's full available history for that stock in one call
     '還原日K價量資料(個股、ETF、大盤)-單檔股票多個區間' -> args: (symbol)
 
 Credentials are resolved in this order: C:\Personal\KGI\kgi.txt (KEY=VALUE
-lines, see Get-MinuteKbars-KGI.py for the format) -> environment variables
+lines, see kbar.py for the format) -> environment variables
 (KGI_ID / KGI_PWD / KGI_ACCOUNT) -> interactive prompt.
 
 Usage:
@@ -21,7 +21,9 @@ Usage:
 """
 import argparse
 import getpass
+import json
 import os
+import re
 import sys
 
 import kgisuperpy as kgi
@@ -29,6 +31,7 @@ import kgisuperpy as kgi
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CRED_FILE = r"C:\Personal\KGI\kgi.txt"
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, "output")
+MANIFEST_FILENAME = "stocks_manifest.json"
 
 TABLE_BY_PERIOD = {
     "day": "日K/技術指標/價量資料-單檔股票多個區間",
@@ -41,6 +44,31 @@ TABLE_BY_PERIOD = {
 def resolve_out_path(filename):
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     return os.path.join(OUTPUT_DIR, filename)
+
+
+def update_stocks_manifest(csv_filename):
+    # stocks.html's stock-picker dropdown reads this file to find
+    # out which stock codes have data available. Only filenames matching the
+    # {code}_daily.csv / {code}_kbar.csv convention it actually looks for are
+    # recorded - anything else (e.g. --out 6547_weekly.csv) is silently
+    # skipped since the chart page wouldn't find it anyway.
+    m = re.match(r"^(.+)_(daily|kbar)\.csv$", os.path.basename(csv_filename), re.IGNORECASE)
+    if not m:
+        return
+    stock, kind = m.group(1), m.group(2).lower()
+    manifest_path = resolve_out_path(MANIFEST_FILENAME)
+    manifest = {}
+    if os.path.isfile(manifest_path):
+        try:
+            with open(manifest_path, "r", encoding="utf-8") as f:
+                manifest = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            manifest = {}
+    entry = manifest.get(stock, {})
+    entry[kind] = True
+    manifest[stock] = entry
+    with open(manifest_path, "w", encoding="utf-8") as f:
+        json.dump(manifest, f, ensure_ascii=False, indent=2, sort_keys=True)
 
 
 def load_cred_file(path):
@@ -97,6 +125,7 @@ def main():
         out_path = resolve_out_path(args.out)
         df.to_csv(out_path, index=False, encoding="utf-8-sig")
         print(f"Exported to {out_path}", file=sys.stderr)
+        update_stocks_manifest(args.out)
 
 
 if __name__ == "__main__":

@@ -10,10 +10,15 @@ and historical minute/daily Kbars via KGI Securities' `kgisuperpy` API).
   intraday volatility days and CSV/XLSX export.
 - **Get-RealtimeStockPrice.ps1** — Live/delayed quote snapshot(s) via TWSE's MIS
   endpoint, covers both TWSE and TPEx in one batched request.
-- **Get-MinuteKbars-KGI.py** — Historical minute-level Kbars over an arbitrary
+- **kbar.py** — Historical minute-level Kbars over an arbitrary
   date range, via KGI's `kgisuperpy` API. Requires a KGI Securities account with
-  API access approved. Also supports `--list-tables` to dump the account's live
-  Data.get() table catalog.
+  API access approved. Every run also fetches the full daily-K history for the
+  stock (needed for `stocks.html`'s chart) and, when re-fetching a stock you've
+  already downloaded, only requests the missing days and merges into the
+  existing file. Run with no arguments for a Tkinter GUI (stock/date range/
+  minutes fields, login dialogs, live progress log); run with any argument for
+  the original CLI, which also supports `--list-tables` to dump the account's
+  live Data.get() table catalog.
 - **Get-DailyK-KGI.py** — Daily/weekly/monthly Kbars with technical indicators
   (MA, MACD, RSI, KD, Bollinger Bands, ADX) and chip/margin data, via the same
   KGI API. Returns the full available history for a symbol in one call.
@@ -26,6 +31,7 @@ and historical minute/daily Kbars via KGI Securities' `kgisuperpy` API).
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install kgisuperpy pandas
+pip install tkcalendar   # only needed for kbar.py's GUI mode
 ```
 
 The KGI scripts need `kgisuperpy`'s native COM component registered

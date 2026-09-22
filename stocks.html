@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>高端疫苗 6547</title>
+</head>
+<body>
+
+<title>高端疫苗 6547</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root {
+    --surface:      #fcfcfb;
+    --plane:        #f9f9f7;
+    --ink:          #0b0b0b;
+    --ink-2:        #52514e;
+    --muted:        #898781;
+    --grid:         #e1e0d9;
+    --baseline:     #c3c2b7;
+    --border:       rgba(11,11,11,0.10);
+    --accent:       #2a78d6;
+    --up:           #b3392f;   /* TW convention: red = price up */
+    --down:         #0c7a3d;   /* TW convention: green = price down */
+    --neutral:      #898781;
+    --chip-bg:      #f1efe9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --surface:      #1a1a19;
+      --plane:        #0d0d0d;
+      --ink:          #ffffff;
+      --ink-2:        #c3c2b7;
+      --muted:        #898781;
+      --grid:         #2c2c2a;
+      --baseline:     #383835;
+      --border:       rgba(255,255,255,0.10);
+      --accent:       #3987e5;
+      --up:           #e8756a;
+      --down:         #3dbb72;
+      --neutral:      #898781;
+      --chip-bg:      #232321;
+    }
+  }
+  :root[data-theme="dark"] {
+    --surface:      #1a1a19;
+    --plane:        #0d0d0d;
+    --ink:          #ffffff;
+    --ink-2:        #c3c2b7;
+    --muted:        #898781;
+    --grid:         #2c2c2a;
+    --baseline:     #383835;
+    --border:       rgba(255,255,255,0.10);
+    --accent:       #3987e5;
+    --up:           #e8756a;
+    --down:         #3dbb72;
+    --neutral:      #898781;
+    --chip-bg:      #232321;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--plane);
+    color: var(--ink);
+    font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    padding-inline: 16px;
+    padding-block: 28px 48px;
+    display: flex;
+    justify-content: center;
+  }
+  .page { width: 100%; max-width: 920px; display: flex; flex-direction: column; gap: 22px; }
+
+  .num { font-variant-numeric: tabular-nums; }
+  .mono { font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; }
+
+  header.head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px 20px; }
+  .id-block { display: flex; align-items: baseline; gap: 10px; }
+  .code { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; color: var(--muted); background: var(--chip-bg); border: 1px solid var(--border); padding: 2px 8px; border-radius: 5px; }
+  .stock-select {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600; color: var(--ink-2);
+    background: var(--chip-bg); border: 1px solid var(--border); border-radius: 7px; padding: 3px 8px; cursor: pointer;
+  }
+
+  .bt-chart-area { position: relative; }
+  .bt-chart-scroll { overflow-x: auto; }
+  .bt-chart-scroll svg.chart.is-scaled { width: auto; max-width: none; }
+  #btChartYAxis {
+    position: absolute; left: 0; top: 0; width: 54px; max-width: 54px; height: 260px;
+    background: var(--surface); pointer-events: none; z-index: 2;
+  }
+  .day-divider { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 2; opacity: 0.8; }
+
+  .bt-density-control { display: flex; align-items: center; gap: 8px; }
+  .bt-density-value {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12.5px; font-weight: 700;
+    color: var(--ink); min-width: 2.4em; text-align: right;
+  }
+  #btDensitySlider {
+    width: 220px; max-width: 45vw; accent-color: var(--accent); cursor: pointer;
+  }
+
+  .tab-bar { display: flex; gap: 6px; }
+  .tab-btn {
+    font-family: inherit; font-size: 13.5px; font-weight: 700; color: var(--ink-2);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 18px; cursor: pointer;
+  }
+  .tab-btn:hover { background: var(--chip-bg); }
+  .tab-btn[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tab-panel { display: flex; flex-direction: column; gap: 22px; }
+  h1 { font-size: 22px; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
+  .market-tag { font-size: 12px; color: var(--muted); }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .stat { background: var(--surface); padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat .value { font-size: 19px; font-weight: 700; font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  .stat .value.up { color: var(--up); }
+  .stat .value.down { color: var(--down); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+
+  .range-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .range-row .hint { font-size: 12px; color: var(--muted); }
+  .range-buttons { display: flex; gap: 4px; }
+  .range-buttons button {
+    font-family: inherit; font-size: 12px; font-weight: 700; color: var(--ink-2);
+    background: transparent; border: 1px solid var(--border); border-radius: 7px;
+    padding: 5px 11px; cursor: pointer;
+  }
+  .range-buttons button:hover { background: var(--chip-bg); }
+  .range-buttons button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .chart-wrap { position: relative; padding: 16px 16px 6px; }
+  svg.chart { display: block; width: 100%; max-width: 100%; height: auto; overflow: visible; }
+  .gridline { stroke: var(--grid); stroke-width: 1; }
+  .baseline { stroke: var(--baseline); stroke-width: 1; }
+  .panel-label { fill: var(--muted); font-size: 10px; font-family: 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: 0.04em; }
+  .axis-label { fill: var(--muted); font-size: 10.5px; font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  .wick { stroke-width: 1; }
+  .last-close-line { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.7; }
+  .last-close-label { fill: var(--accent); font-size: 10px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-weight: 600; }
+  .level-line { stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.55; }
+  .level-line.up { stroke: var(--up); }
+  .level-line.down { stroke: var(--down); }
+  .level-label { font-size: 9px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-weight: 600; }
+  .level-label.up { fill: var(--up); }
+  .level-label.down { fill: var(--down); }
+  .crosshair-x { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; }
+  .hover-col { fill: var(--ink); opacity: 0; }
+
+  .tooltip {
+    position: absolute; pointer-events: none; opacity: 0; transition: opacity 0.08s;
+    background: var(--ink); color: var(--surface); border-radius: 9px; padding: 9px 11px;
+    font-size: 12px; line-height: 1.55; white-space: nowrap; transform: translate(-50%, calc(-100% - 14px));
+    box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+    z-index: 5;
+  }
+  .tooltip .t-date { font-weight: 700; margin-bottom: 3px; font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  .tooltip .t-row { display: flex; justify-content: space-between; gap: 14px; }
+  .tooltip .t-row span:last-child { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  .legend { display: flex; align-items: center; gap: 16px; padding: 0 16px 14px; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; }
+  .legend .item { display: flex; align-items: center; gap: 6px; }
+  .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .swatch.line { width: 14px; height: 2px; border-radius: 2px; }
+
+  .table-scroll { max-height: 480px; overflow: auto; border-top: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 640px; }
+  thead th {
+    position: sticky; top: 0; background: var(--surface); text-align: right; font-weight: 700;
+    color: var(--ink-2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 9px 12px; border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  thead th:first-child, tbody td:first-child { text-align: left; }
+  tbody td { padding: 7px 12px; text-align: right; border-bottom: 1px solid var(--grid); font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: var(--chip-bg); }
+  td.date-cell { font-family: 'Manrope', sans-serif; font-weight: 600; }
+  td.up { color: var(--up); }
+  td.down { color: var(--down); }
+
+  footer.note { font-size: 11.5px; color: var(--muted); padding: 2px 2px; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(11,11,11,0.5);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.12s;
+  }
+  .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+  .modal-panel {
+    background: var(--surface); border-radius: 16px; border: 1px solid var(--border);
+    width: 100%; max-width: 620px; max-height: 88vh;
+    overflow-x: hidden; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .modal-head h2 { font-size: 15px; margin: 0; font-weight: 800; }
+  .modal-close {
+    background: transparent; border: 1px solid var(--border); border-radius: 8px;
+    width: 28px; height: 28px; cursor: pointer; color: var(--ink-2); font-size: 15px; line-height: 1;
+  }
+  .modal-close:hover { background: var(--chip-bg); }
+  .modal-stats { display: flex; gap: 8px 16px; padding: 12px 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); border-bottom: 1px solid var(--border); }
+  .modal-stats b { font-family: 'IBM Plex Mono', ui-monospace, monospace; color: var(--ink); font-weight: 700; }
+  .modal-stats .up b, .modal-stats.up b { color: var(--up); }
+  .modal-stats .down b, .modal-stats.down b { color: var(--down); }
+  .modal-chart-wrap { position: relative; padding: 14px 16px 6px; }
+  .modal-empty { padding: 40px 18px; text-align: center; color: var(--muted); font-size: 13px; }
+
+  .backtest-form { display: flex; flex-wrap: wrap; gap: 10px 16px; padding: 14px 16px; align-items: end; border-bottom: 1px solid var(--border); }
+  .backtest-form label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .backtest-form input, .backtest-form select {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; color: var(--ink);
+    background: var(--chip-bg); border: 1px solid var(--border); border-radius: 7px; padding: 6px 8px; width: 108px;
+  }
+  .backtest-form select { width: 138px; font-family: 'Manrope', sans-serif; }
+  .backtest-form input#btCapital { width: 116px; text-align: right; }
+  .backtest-form input[type="date"] { width: 134px; }
+  .backtest-form button {
+    font-family: inherit; font-size: 13px; font-weight: 700; color: #fff; background: var(--accent);
+    border: none; border-radius: 8px; padding: 0 16px; height: 33px; cursor: pointer;
+  }
+  .backtest-form button:hover { opacity: 0.9; }
+  .backtest-form button:disabled { opacity: 0.6; cursor: default; }
+  .bt-hint { padding: 14px 16px; font-size: 12.5px; color: var(--muted); }
+  .bt-summary.stats { border: none; border-radius: 0; border-bottom: 1px solid var(--border); }
+  .bt-notes { padding: 10px 16px; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 2px; }
+  .bt-notes:empty { display: none; }
+
+  @media (max-width: 480px) {
+    .range-row { flex-direction: column; align-items: stretch; }
+    .range-buttons { justify-content: space-between; }
+    .range-buttons button { flex: 1; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="head">
+    <div class="id-block">
+      <h1 id="stockName">高端疫苗</h1>
+      <span class="code" id="stockCode">6547</span>
+      <select id="stockSelect" class="stock-select" aria-label="選擇股票" style="display:none"></select>
+    </div>
+    <span class="market-tag">上櫃(TPEx) · 日K</span>
+  </header>
+
+  <div class="tab-bar" id="tabBar" role="tablist">
+    <button class="tab-btn" type="button" data-tab="chart" role="tab" aria-selected="true">K 線圖表</button>
+    <button class="tab-btn" type="button" data-tab="backtest" role="tab" aria-selected="false">策略試算</button>
+  </div>
+
+  <div class="tab-panel" id="tabChart">
+
+  <div class="stats" id="stats"></div>
+
+  <div class="panel">
+    <div class="range-row">
+      <div class="hint" id="rangeHint">載入中…</div>
+      <div class="range-buttons" id="rangeButtons" role="group" aria-label="時間區間">
+        <button data-range="30">1個月</button>
+        <button data-range="90">3個月</button>
+        <button data-range="180">6個月</button>
+        <button data-range="365">1年</button>
+        <button data-range="0">全部</button>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <svg class="chart" id="chart" viewBox="0 0 880 300" preserveAspectRatio="none" role="img" aria-label="K線圖含成交量,顯示開高低收與每日成交量">
+        <g id="gridGroup"></g>
+        <line id="lastCloseLine" class="last-close-line" x1="0" x2="0" y1="0" y2="0"></line>
+        <text id="lastCloseLabel" class="last-close-label"></text>
+        <g id="candles"></g>
+        <g id="volumeBars"></g>
+        <g id="xLabels"></g>
+        <g id="yLabels"></g>
+        <g id="volLabels"></g>
+        <rect id="hoverCol" class="hover-col" y="0" width="1" height="1"></rect>
+        <line id="crosshair" class="crosshair-x" x1="0" y1="0" x2="0" y2="0"></line>
+        <rect id="hoverCatcher" x="0" y="0" width="880" height="300" fill="transparent"></rect>
+      </svg>
+      <div class="tooltip" id="tooltip"></div>
+    </div>
+
+    <div class="legend">
+      <span class="item"><span class="swatch" style="background:var(--up)"></span>收紅(收盤&gt;開盤)</span>
+      <span class="item"><span class="swatch" style="background:var(--down)"></span>收黑(收盤&lt;開盤)</span>
+      <span class="item"><span class="swatch line" style="background:var(--accent)"></span>最新收盤參考線</span>
+      <span class="item">影線 = 最高 / 最低價;下方色柱 = 成交量</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>日期</th>
+            <th>開盤價</th>
+            <th>最高價</th>
+            <th>最低價</th>
+            <th>收盤價</th>
+            <th>漲跌幅</th>
+            <th>最低振幅%</th>
+            <th>最高振幅%</th>
+            <th>總振幅%</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="tab-panel" id="tabBacktest" style="display:none">
+
+  <div class="panel">
+    <div class="range-row">
+      <div class="hint" id="btPanelHint">策略試算 · 逐分鐘回測,演算法與 Backtest-DipBuy.py 完全相同(output/6547_kbar.csv 全部區間)</div>
+    </div>
+    <div class="backtest-form" id="backtestForm">
+      <label>起始日<input type="date" id="btStartDate"></label>
+      <label>結束日<input type="date" id="btEndDate"></label>
+      <label>買進%<input type="number" id="btBuyPct" value="-1" step="0.1"></label>
+      <label>賣出%<input type="number" id="btSellPct" value="1" step="0.1"></label>
+      <label>最高資金<input type="text" inputmode="numeric" id="btCapital" value="1,200,000"></label>
+      <label>模式
+        <select id="btMode">
+          <option value="hold_until_target">持有至達標</option>
+          <option value="forced_exit">當沖強制平倉</option>
+        </select>
+      </label>
+      <label>停損%<input type="number" id="btStopLoss" placeholder="無" step="0.1"></label>
+      <label>跳空濾網%<input type="number" id="btMaxGap" placeholder="無" step="0.1"></label>
+      <label>反彈確認
+        <select id="btConfirmType">
+          <option value="">無(觸價即買)</option>
+          <option value="bars">連續上漲根數</option>
+          <option value="recovery">低點反彈%</option>
+          <option value="retest" selected>回測觸發價</option>
+        </select>
+      </label>
+      <label id="btConfirmValueWrap" style="display:none">
+        <span id="btConfirmValueLabel"></span>
+        <input type="number" id="btConfirmValue">
+      </label>
+      <button id="btRun" type="button">執行回測</button>
+    </div>
+    <div id="btSummary" class="bt-hint">尚未執行,調整參數後按「執行回測」(會載入 output/6547_kbar.csv)</div>
+
+    <div class="range-row" id="btBenchmarkHeader" style="display:none">
+      <div class="hint">對照組 · 買進持有(起始日開盤買進 → 最後一天收盤賣出,同樣最高資金與手續費/稅率)</div>
+    </div>
+    <div id="btBenchmark"></div>
+
+    <div class="chart-wrap" id="btChartWrap" style="display:none">
+      <div class="range-row" style="padding:0 0 10px; border-bottom:none;">
+        <div class="hint">超出畫面寬度時可左右滑動</div>
+        <div class="bt-density-control">
+          <span id="btDensityLabel" class="bt-density-value">全部</span>
+          <input type="range" id="btDensitySlider" min="0" max="7" step="1" value="7" aria-label="每畫面顯示天數">
+        </div>
+      </div>
+      <div class="bt-chart-area" id="btChartArea">
+        <svg class="chart bt-yaxis" id="btChartYAxis" viewBox="0 0 54 260" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="bt-chart-scroll" id="btChartScroll">
+          <svg class="chart" id="btChart" viewBox="0 0 880 260" preserveAspectRatio="none" role="img" aria-label="回測期間分鐘走勢圖,三角形標示買賣點"></svg>
+        </div>
+      </div>
+    </div>
+    <div class="legend" id="btChartLegend" style="display:none">
+      <span class="item"><span class="swatch line" style="background:var(--accent)"></span>收盤價</span>
+      <span class="item"><span class="swatch" style="background:var(--up)"></span>▲ 買進點</span>
+      <span class="item"><span class="swatch" style="background:var(--down)"></span>▼ 賣出點</span>
+    </div>
+
+    <div class="table-scroll" id="btTableWrap" style="display:none">
+      <table>
+        <thead>
+          <tr>
+            <th>買進日期</th><th>買進時間</th><th>買進價</th>
+            <th>賣出日期</th><th>賣出時間</th><th>賣出價</th>
+            <th>張數</th><th>當筆獲利</th><th>累積獲利</th><th>跨日</th><th>原因</th>
+          </tr>
+        </thead>
+        <tbody id="btTableBody"></tbody>
+      </table>
+    </div>
+    <div id="btNotes" class="bt-notes"></div>
+  </div>
+
+  </div>
+
+  <footer class="note" id="footerNote">
+    資料來源:凱基證券 API(日K)· output/6547_daily.csv · 台股慣例:紅漲綠跌 · 點擊表格任一列可看當日分鐘走勢
+  </footer>
+
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <h2 id="modalTitle">當日走勢</h2>
+      <button class="modal-close" id="modalClose" aria-label="關閉" type="button">✕</button>
+    </div>
+    <div class="modal-stats" id="modalStats"></div>
+    <div class="modal-chart-wrap" id="modalChartWrap">
+      <svg class="chart" id="dayChart" viewBox="0 0 560 220" preserveAspectRatio="none" role="img" aria-label="當日分鐘走勢圖"></svg>
+      <div class="tooltip" id="dayTooltip"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var state = {
+    rows: [], rangeDays: 30, stock: '6547',
+    btChartDensity: 'fit', // 'fit' = squeeze to container width; else px-per-bar (scrolls)
+    btChartFlatRows: null, btChartTrades: null // last-run backtest chart data, redrawn on density change / scroll
+  };
+
+  function fmt(n, digits) {
+    if (n === null || n === undefined || Number.isNaN(n)) return '—';
+    return n.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  }
+  function fmtInt(n) {
+    if (n === null || n === undefined || Number.isNaN(n)) return '—';
+    return Math.round(n).toLocaleString('en-US');
+  }
+  function pct(n) {
+    if (n === null || n === undefined || Number.isNaN(n)) return '—';
+    var s = n > 0 ? '+' : '';
+    return s + n.toFixed(2) + '%';
+  }
+  function signClass(n) {
+    if (n > 0) return 'up';
+    if (n < 0) return 'down';
+    return '';
+  }
+  function dirColorVar(open, close) {
+    if (close > open) return 'var(--up)';
+    if (close < open) return 'var(--down)';
+    return 'var(--neutral)';
+  }
+
+  // Parses the FULL 54-column KGI daily-K export (output/{code}_daily.csv) by
+  // header name, so it keeps working unchanged if KGI reorders/adds columns.
+  function parseCSV(text) {
+    function clean(s) { return s.replace(/^"|"$/g, ''); }
+    var lines = text.trim().split(/\r?\n/);
+    var headers = lines[0].split(',').map(clean);
+    function colIndex(name) {
+      var idx = headers.indexOf(name);
+      if (idx === -1) throw new Error('找不到欄位: ' + name);
+      return idx;
+    }
+    function optColIndex(name) { return headers.indexOf(name); }
+    var iDate = colIndex('日期'), iOpen = colIndex('開盤價'), iHigh = colIndex('最高價'),
+        iLow = colIndex('最低價'), iClose = colIndex('收盤價'),
+        iChange = colIndex('漲跌幅(%)'), iVolume = colIndex('成交量'),
+        iName = optColIndex('股票名稱');
+
+    var out = [];
+    for (var i = 1; i < lines.length; i++) {
+      if (!lines[i].trim()) continue;
+      var parts = lines[i].split(',').map(clean);
+      var open = parseFloat(parts[iOpen]);
+      var high = parseFloat(parts[iHigh]);
+      var low = parseFloat(parts[iLow]);
+      var close = parseFloat(parts[iClose]);
+      var changePct = parseFloat(parts[iChange]);
+      var volume = parseFloat(parts[iVolume]);
+      out.push({
+        date: parts[iDate],
+        name: iName !== -1 ? parts[iName] : '',
+        open: open, high: high, low: low, close: close,
+        changePct: changePct, volume: volume,
+        lowAmp: open ? (low - open) / open * 100 : NaN,
+        highAmp: open ? (high - open) / open * 100 : NaN,
+        totalAmp: open ? (high - low) / open * 100 : NaN
+      });
+    }
+    return out;
+  }
+
+  function filteredRows() {
+    var rows = state.rows;
+    if (!state.rangeDays) return rows;
+    var lastDate = new Date(rows[rows.length - 1].date);
+    var cutoff = new Date(lastDate);
+    cutoff.setDate(cutoff.getDate() - state.rangeDays);
+    return rows.filter(function (r) { return new Date(r.date) >= cutoff; });
+  }
+
+  function renderStats(rows) {
+    var last = rows[rows.length - 1];
+    var first = rows[0];
+    var periodChange = first.open ? (last.close - first.open) / first.open * 100 : NaN;
+    var high = Math.max.apply(null, rows.map(function (r) { return r.high; }));
+    var low = Math.min.apply(null, rows.map(function (r) { return r.low; }));
+    var avgVol = rows.reduce(function (s, r) { return s + (r.volume || 0); }, 0) / rows.length;
+
+    var el = document.getElementById('stats');
+    el.innerHTML =
+      '<div class="stat"><span class="label">最新收盤(' + last.date + ')</span>' +
+        '<span class="value">' + fmt(last.close, 1) + '</span></div>' +
+      '<div class="stat"><span class="label">當日漲跌幅</span>' +
+        '<span class="value ' + signClass(last.changePct) + '">' + pct(last.changePct) + '</span></div>' +
+      '<div class="stat"><span class="label">區間漲跌</span>' +
+        '<span class="value ' + signClass(periodChange) + '">' + pct(periodChange) + '</span></div>' +
+      '<div class="stat"><span class="label">區間最高</span><span class="value">' + fmt(high, 1) + '</span></div>' +
+      '<div class="stat"><span class="label">區間最低</span><span class="value">' + fmt(low, 1) + '</span></div>' +
+      '<div class="stat"><span class="label">區間均量(張)</span><span class="value">' + fmtInt(avgVol) + '</span></div>';
+  }
+
+  function renderTable(rows) {
+    var body = document.getElementById('tableBody');
+    var html = '';
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      html += '<tr data-date="' + r.date + '" title="查看 ' + r.date + ' 分鐘走勢">' +
+        '<td class="date-cell">' + r.date + '</td>' +
+        '<td>' + fmt(r.open, 1) + '</td>' +
+        '<td>' + fmt(r.high, 1) + '</td>' +
+        '<td>' + fmt(r.low, 1) + '</td>' +
+        '<td>' + fmt(r.close, 1) + '</td>' +
+        '<td class="' + signClass(r.changePct) + '">' + pct(r.changePct) + '</td>' +
+        '<td class="' + signClass(r.lowAmp) + '">' + pct(r.lowAmp) + '</td>' +
+        '<td class="' + signClass(r.highAmp) + '">' + pct(r.highAmp) + '</td>' +
+        '<td>' + pct(r.totalAmp) + '</td>' +
+        '</tr>';
+    }
+    body.innerHTML = html;
+  }
+
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  // Tooltip is horizontally centered on `desiredLeft` via translate(-50%, ...),
+  // so near either edge of `containerWidth` it can get clipped by an
+  // overflow:hidden ancestor. Clamp the center point so the box always stays
+  // fully inside [margin, containerWidth - margin].
+  function clampedTooltipLeft(tooltip, desiredLeft, containerWidth) {
+    var margin = 6;
+    var half = (tooltip.offsetWidth || 140) / 2;
+    var min = margin + half;
+    var max = containerWidth - margin - half;
+    if (max < min) return containerWidth / 2;
+    return Math.max(min, Math.min(max, desiredLeft));
+  }
+
+  function renderChart(rows) {
+    var W = 880, padL = 46, padR = 8;
+    var priceTop = 8, priceH = 196;
+    var volGap = 12, volH = 60;
+    var volTop = priceTop + priceH + volGap;
+    var volBottom = volTop + volH;
+    var labelY = volBottom + 22;
+    var plotW = W - padL - padR;
+
+    var highs = rows.map(function (r) { return r.high; });
+    var lows = rows.map(function (r) { return r.low; });
+    var yMax = Math.max.apply(null, highs);
+    var yMin = Math.min.apply(null, lows);
+    var pad = (yMax - yMin) * 0.08 || 1;
+    yMax += pad; yMin -= pad;
+    var volMax = Math.max.apply(null, rows.map(function (r) { return r.volume || 0; })) || 1;
+
+    var slotW = plotW / rows.length;
+    var bodyW = Math.max(1, Math.min(slotW * 0.62, 10));
+
+    function x(i) { return padL + (i + 0.5) * slotW; }
+    function yPrice(v) { return priceTop + (1 - (v - yMin) / (yMax - yMin)) * priceH; }
+    function yVol(v) { return volBottom - (v / volMax) * volH; }
+
+    // grid + y labels (price panel)
+    var gridGroup = document.getElementById('gridGroup');
+    var yLabels = document.getElementById('yLabels');
+    var volLabels = document.getElementById('volLabels');
+    gridGroup.innerHTML = ''; yLabels.innerHTML = ''; volLabels.innerHTML = '';
+
+    var steps = 4;
+    for (var s = 0; s <= steps; s++) {
+      var v = yMin + (yMax - yMin) * (s / steps);
+      var yy = yPrice(v);
+      gridGroup.appendChild(el('line', { x1: padL, x2: W - padR, y1: yy, y2: yy, class: 'gridline' }));
+      var txt = el('text', { x: padL - 8, y: yy + 3.5, 'text-anchor': 'end', class: 'axis-label' });
+      txt.textContent = v.toFixed(1);
+      yLabels.appendChild(txt);
+    }
+    gridGroup.appendChild(el('line', { x1: padL, x2: W - padR, y1: priceTop + priceH, y2: priceTop + priceH, class: 'baseline' }));
+
+    // volume panel top label + baseline
+    var volLabelTop = el('text', { x: padL - 8, y: volTop + 3.5, 'text-anchor': 'end', class: 'axis-label' });
+    volLabelTop.textContent = fmtInt(volMax);
+    volLabels.appendChild(volLabelTop);
+    var volLabelBase = el('text', { x: padL - 8, y: volBottom + 3.5, 'text-anchor': 'end', class: 'axis-label' });
+    volLabelBase.textContent = '0';
+    volLabels.appendChild(volLabelBase);
+    gridGroup.appendChild(el('line', { x1: padL, x2: W - padR, y1: volBottom, y2: volBottom, class: 'baseline' }));
+    var panelTag = el('text', { x: W - padR, y: volTop + 3.5, 'text-anchor': 'end', class: 'panel-label' });
+    panelTag.textContent = '成交量(張)';
+    volLabels.appendChild(panelTag);
+
+    // x labels (sparse)
+    var xLabelsG = document.getElementById('xLabels');
+    xLabelsG.innerHTML = '';
+    var labelCount = Math.min(7, rows.length);
+    for (var li = 0; li < labelCount; li++) {
+      var idx = Math.round((li / Math.max(1, labelCount - 1)) * (rows.length - 1));
+      var txt2 = el('text', {
+        x: x(idx), y: labelY,
+        'text-anchor': li === 0 ? 'start' : (li === labelCount - 1 ? 'end' : 'middle'),
+        class: 'axis-label'
+      });
+      txt2.textContent = rows[idx].date.slice(2);
+      xLabelsG.appendChild(txt2);
+    }
+
+    // candles + volume bars
+    var candles = document.getElementById('candles');
+    var volBars = document.getElementById('volumeBars');
+    candles.innerHTML = ''; volBars.innerHTML = '';
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var cx = x(i);
+      var color = dirColorVar(r.open, r.close);
+
+      candles.appendChild(el('line', {
+        x1: cx, x2: cx, y1: yPrice(r.high), y2: yPrice(r.low),
+        class: 'wick', style: 'stroke:' + color
+      }));
+      var bodyTop = yPrice(Math.max(r.open, r.close));
+      var bodyH = Math.max(1, Math.abs(yPrice(r.open) - yPrice(r.close)));
+      candles.appendChild(el('rect', {
+        x: cx - bodyW / 2, y: bodyTop, width: bodyW, height: bodyH,
+        style: 'fill:' + color
+      }));
+
+      var volH2 = volBottom - yVol(r.volume || 0);
+      volBars.appendChild(el('rect', {
+        x: cx - bodyW / 2, y: yVol(r.volume || 0), width: bodyW, height: Math.max(0.5, volH2),
+        style: 'fill:' + color, opacity: 0.75
+      }));
+    }
+
+    // last-close reference line
+    var last = rows[rows.length - 1];
+    var lcY = yPrice(last.close);
+    var lcLine = document.getElementById('lastCloseLine');
+    lcLine.setAttribute('x1', padL); lcLine.setAttribute('x2', W - padR);
+    lcLine.setAttribute('y1', lcY); lcLine.setAttribute('y2', lcY);
+    var lcLabel = document.getElementById('lastCloseLabel');
+    lcLabel.setAttribute('x', W - padR); lcLabel.setAttribute('y', lcY - 4);
+    lcLabel.setAttribute('text-anchor', 'end');
+    lcLabel.textContent = fmt(last.close, 1);
+
+    // hover interaction
+    var catcher = document.getElementById('hoverCatcher');
+    catcher.setAttribute('height', volBottom - priceTop);
+    var crosshair = document.getElementById('crosshair');
+    crosshair.setAttribute('y1', priceTop); crosshair.setAttribute('y2', volBottom);
+    var hoverCol = document.getElementById('hoverCol');
+    hoverCol.setAttribute('y', priceTop); hoverCol.setAttribute('height', volBottom - priceTop);
+    var tooltip = document.getElementById('tooltip');
+    var svg = document.getElementById('chart');
+
+    function onMove(evt) {
+      var rect = svg.getBoundingClientRect();
+      var clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+      var relX = (clientX - rect.left) / rect.width * W;
+      var idx = Math.floor((relX - padL) / slotW);
+      idx = Math.max(0, Math.min(rows.length - 1, idx));
+      var r = rows[idx];
+      var px = x(idx);
+
+      crosshair.setAttribute('x1', px); crosshair.setAttribute('x2', px);
+      crosshair.style.opacity = 1;
+      hoverCol.setAttribute('x', px - slotW / 2);
+      hoverCol.setAttribute('width', slotW);
+      hoverCol.style.opacity = 0.05;
+
+      var tipLeft = (px / W) * rect.width;
+      var tipTop = (priceTop / 300) * rect.height;
+      tooltip.style.opacity = 1;
+      tooltip.innerHTML =
+        '<div class="t-date">' + r.date + '</div>' +
+        '<div class="t-row"><span>開盤</span><span>' + fmt(r.open, 1) + '</span></div>' +
+        '<div class="t-row"><span>最高</span><span>' + fmt(r.high, 1) + '</span></div>' +
+        '<div class="t-row"><span>最低</span><span>' + fmt(r.low, 1) + '</span></div>' +
+        '<div class="t-row"><span>收盤</span><span>' + fmt(r.close, 1) + '</span></div>' +
+        '<div class="t-row"><span>漲跌幅</span><span>' + pct(r.changePct) + '</span></div>' +
+        '<div class="t-row"><span>成交量</span><span>' + fmtInt(r.volume) + ' 張</span></div>' +
+        '<div class="t-row"><span>總振幅</span><span>' + pct(r.totalAmp) + '</span></div>';
+      tooltip.style.left = clampedTooltipLeft(tooltip, tipLeft, rect.width) + 'px';
+      tooltip.style.top = tipTop + 'px';
+    }
+    function onLeave() {
+      crosshair.style.opacity = 0;
+      hoverCol.style.opacity = 0;
+      tooltip.style.opacity = 0;
+    }
+    catcher.onmousemove = onMove;
+    catcher.onmouseleave = onLeave;
+    catcher.ontouchmove = function (e) { onMove(e); e.preventDefault(); };
+    catcher.ontouchend = onLeave;
+  }
+
+  // ---- Intraday drill-down (click a table row -> that day's minute chart) ----
+
+  var minuteCache = null; // Promise -> { 'yyyy-mm-dd': [{hhmm,open,high,low,close,volume}, ...] }
+
+  function loadMinuteData() {
+    if (minuteCache) return minuteCache;
+    minuteCache = fetch('output/' + state.stock + '_kbar.csv')
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function (text) {
+        function clean(s) { return s.replace(/^"|"$/g, ''); }
+        var lines = text.trim().split(/\r?\n/);
+        var headers = lines[0].split(',').map(clean);
+        function ci(name) {
+          var i = headers.indexOf(name);
+          if (i === -1) throw new Error('找不到欄位: ' + name);
+          return i;
+        }
+        var iDate = ci('日期'), iHHMM = ci('hhmm'), iOpen = ci('開盤價'),
+            iHigh = ci('最高價'), iLow = ci('最低價'), iClose = ci('收盤價'), iVol = ci('成交量');
+        var map = {};
+        for (var i = 1; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          var p = lines[i].split(',').map(clean);
+          var d = p[iDate];
+          if (!map[d]) map[d] = [];
+          map[d].push({
+            hhmm: p[iHHMM],
+            open: parseFloat(p[iOpen]), high: parseFloat(p[iHigh]),
+            low: parseFloat(p[iLow]), close: parseFloat(p[iClose]),
+            volume: parseFloat(p[iVol])
+          });
+        }
+        for (var d2 in map) map[d2].sort(function (a, b) { return a.hhmm.localeCompare(b.hhmm); });
+        return map;
+      });
+    return minuteCache;
+  }
+
+  function hhmmLabel(hhmm) { return hhmm.slice(0, 2) + ':' + hhmm.slice(2); }
+
+  function renderDayChart(dayRows) {
+    var wrap = document.getElementById('modalChartWrap');
+    wrap.innerHTML = '<svg class="chart" id="dayChart" viewBox="0 0 560 220" preserveAspectRatio="none" role="img" aria-label="當日分鐘走勢圖"></svg><div class="tooltip" id="dayTooltip"></div>';
+    var svg = document.getElementById('dayChart');
+    var W = 560, H = 220, padL = 46, padR = 8, padT = 8, padB = 22;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var dayOpen = dayRows[0].open;
+    var closes = dayRows.map(function (r) { return r.close; });
+    var dayMax = Math.max.apply(null, closes), dayMin = Math.min.apply(null, closes);
+
+    // Only draw a +-% level line if the day's price actually reached it -
+    // don't stretch the chart to show thresholds that were never approached.
+    var levels = [3, 2, 1, -1, -2, -3]
+      .map(function (p) { return { pct: p, value: dayOpen * (1 + p / 100) }; })
+      .filter(function (l) { return l.pct > 0 ? dayMax >= l.value : dayMin <= l.value; });
+
+    var yMax = dayMax, yMin = dayMin;
+    var pad = (yMax - yMin) * 0.12 || Math.max(0.5, yMax * 0.01);
+    yMax += pad; yMin -= pad;
+
+    function x(i) { return padL + (dayRows.length === 1 ? plotW / 2 : (i / (dayRows.length - 1)) * plotW); }
+    function y(v) { return padT + (1 - (v - yMin) / (yMax - yMin)) * plotH; }
+
+    var steps = 4;
+    for (var s = 0; s <= steps; s++) {
+      var v = yMin + (yMax - yMin) * (s / steps);
+      var yy = y(v);
+      svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: yy, y2: yy, class: 'gridline' }));
+      var t = el('text', { x: padL - 8, y: yy + 3.5, 'text-anchor': 'end', class: 'axis-label' });
+      t.textContent = v.toFixed(2);
+      svg.appendChild(t);
+    }
+    svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: padT + plotH, y2: padT + plotH, class: 'baseline' }));
+
+    var labelCount = Math.min(6, dayRows.length);
+    for (var li = 0; li < labelCount; li++) {
+      var idx = Math.round((li / Math.max(1, labelCount - 1)) * (dayRows.length - 1));
+      var t2 = el('text', {
+        x: x(idx), y: H - 6,
+        'text-anchor': li === 0 ? 'start' : (li === labelCount - 1 ? 'end' : 'middle'),
+        class: 'axis-label'
+      });
+      t2.textContent = hhmmLabel(dayRows[idx].hhmm);
+      svg.appendChild(t2);
+    }
+
+    // +-1% / +-3% reference lines (from day's open) - red for +, green for -
+    // (TW convention), only shown when the day's price actually reached them
+    levels.forEach(function (l) {
+      var yy = y(l.value);
+      var dir = l.pct > 0 ? 'up' : 'down';
+      svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: yy, y2: yy, class: 'level-line ' + dir }));
+      var lbl = el('text', { x: W - padR, y: yy - 3, 'text-anchor': 'end', class: 'level-label ' + dir });
+      lbl.textContent = (l.pct > 0 ? '+' : '') + l.pct + '%';
+      svg.appendChild(lbl);
+    });
+
+    // open-price reference line
+    var openY = y(dayOpen);
+    svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: openY, y2: openY, class: 'last-close-line' }));
+
+    var pts = dayRows.map(function (r, i) { return x(i) + ',' + y(r.close); });
+    svg.appendChild(el('path', {
+      d: 'M ' + pts.join(' L '), fill: 'none',
+      style: 'stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round'
+    }));
+
+    var crosshair = el('line', { x1: padL, x2: padL, y1: padT, y2: padT + plotH, class: 'crosshair-x' });
+    svg.appendChild(crosshair);
+    var dot = el('circle', { r: 4, style: 'fill:var(--accent);stroke:var(--surface);stroke-width:2', opacity: 0 });
+    svg.appendChild(dot);
+    var catcher = el('rect', { x: 0, y: 0, width: W, height: H, fill: 'transparent' });
+    svg.appendChild(catcher);
+
+    var tooltip = document.getElementById('dayTooltip');
+    function onMove(evt) {
+      var rect = svg.getBoundingClientRect();
+      var clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+      var relX = (clientX - rect.left) / rect.width * W;
+      var idx2 = Math.round(((relX - padL) / plotW) * (dayRows.length - 1));
+      idx2 = Math.max(0, Math.min(dayRows.length - 1, idx2));
+      var r = dayRows[idx2], px = x(idx2), py = y(r.close);
+      var dayOpen = dayRows[0].open;
+      var ampFromOpen = dayOpen ? (r.close - dayOpen) / dayOpen * 100 : NaN;
+      crosshair.setAttribute('x1', px); crosshair.setAttribute('x2', px); crosshair.style.opacity = 1;
+      dot.setAttribute('cx', px); dot.setAttribute('cy', py); dot.style.opacity = 1;
+      tooltip.style.opacity = 1;
+      tooltip.innerHTML =
+        '<div class="t-date">' + hhmmLabel(r.hhmm) + '</div>' +
+        '<div class="t-row"><span>成交</span><span>' + fmt(r.close, 2) + '</span></div>' +
+        '<div class="t-row"><span>成交量</span><span>' + fmtInt(r.volume) + ' 張</span></div>' +
+        '<div class="t-row"><span>振幅(較開盤)</span><span>' + pct(ampFromOpen) + '</span></div>';
+      tooltip.style.left = clampedTooltipLeft(tooltip, (px / W) * rect.width, rect.width) + 'px';
+      tooltip.style.top = ((py / H) * rect.height) + 'px';
+    }
+    function onLeave() { crosshair.style.opacity = 0; dot.style.opacity = 0; tooltip.style.opacity = 0; }
+    catcher.onmousemove = onMove;
+    catcher.onmouseleave = onLeave;
+    catcher.ontouchmove = function (e) { onMove(e); e.preventDefault(); };
+    catcher.ontouchend = onLeave;
+  }
+
+  function openDayModal(date) {
+    var backdrop = document.getElementById('modalBackdrop');
+    document.getElementById('modalTitle').textContent = date + ' 分鐘走勢';
+    var statsEl = document.getElementById('modalStats');
+    statsEl.innerHTML = '<span>載入中…</span>';
+    document.getElementById('modalChartWrap').innerHTML =
+      '<svg class="chart" id="dayChart" viewBox="0 0 560 220" preserveAspectRatio="none"></svg><div class="tooltip" id="dayTooltip"></div>';
+    backdrop.classList.add('open');
+
+    loadMinuteData().then(function (map) {
+      var dayRows = map[date];
+      if (!dayRows || !dayRows.length) {
+        document.getElementById('modalChartWrap').innerHTML =
+          '<div class="modal-empty">output/' + state.stock + '_kbar.csv 沒有 ' + date + ' 這天的分鐘資料(分鐘資料只涵蓋部分近期區間)</div>';
+        statsEl.innerHTML = '';
+        return;
+      }
+      var dOpen = dayRows[0].open;
+      var dClose = dayRows[dayRows.length - 1].close;
+      var dHigh = Math.max.apply(null, dayRows.map(function (r) { return r.high; }));
+      var dLow = Math.min.apply(null, dayRows.map(function (r) { return r.low; }));
+      var dVol = dayRows.reduce(function (s, r) { return s + (r.volume || 0); }, 0);
+      var chg = dOpen ? (dClose - dOpen) / dOpen * 100 : NaN;
+      statsEl.innerHTML =
+        '<span>開盤 <b>' + fmt(dOpen, 2) + '</b></span>' +
+        '<span>最高 <b>' + fmt(dHigh, 2) + '</b></span>' +
+        '<span>最低 <b>' + fmt(dLow, 2) + '</b></span>' +
+        '<span>收盤 <b>' + fmt(dClose, 2) + '</b></span>' +
+        '<span class="' + signClass(chg) + '">漲跌 <b>' + pct(chg) + '</b></span>' +
+        '<span>成交量 <b>' + fmtInt(dVol) + '</b> 張</span>';
+      renderDayChart(dayRows);
+    }).catch(function (err) {
+      document.getElementById('modalChartWrap').innerHTML =
+        '<div class="modal-empty">讀取 output/' + state.stock + '_kbar.csv 失敗:' + err + '</div>';
+      statsEl.innerHTML = '';
+    });
+  }
+
+  function closeDayModal() {
+    document.getElementById('modalBackdrop').classList.remove('open');
+  }
+
+  // ---- Strategy backtest (ported 1:1 from Backtest-DipBuy.py) ----
+  // Buy once a day's price first drops to (that day's open * (1 + buyPct/100)), buyPct signed (e.g. -1 = -1%).
+  // Sell once it then rises to (buy day's open * (1 + sellPct/100)). Only one
+  // position at a time. Optional stop-loss / reversal-confirmation / gap filter,
+  // same semantics as the Python script - see that file for the full rationale.
+
+  var BT_FEE_RATE = 0.001425, BT_DAYTRADE_TAX_RATE = 0.0015, BT_NORMAL_TAX_RATE = 0.003, BT_LOT_SIZE = 1000;
+
+  function btSettleTrade(capital, buyPrice, sellPrice, buyDate, sellDate) {
+    var lots = Math.floor(capital / (buyPrice * BT_LOT_SIZE));
+    if (lots <= 0) return null;
+    var shares = lots * BT_LOT_SIZE;
+    var taxRate = buyDate === sellDate ? BT_DAYTRADE_TAX_RATE : BT_NORMAL_TAX_RATE;
+    var cost = shares * buyPrice, buyFee = cost * BT_FEE_RATE;
+    var proceeds = shares * sellPrice, sellFee = proceeds * BT_FEE_RATE, sellTax = proceeds * taxRate;
+    return { lots: lots, net: proceeds - sellFee - sellTax - cost - buyFee };
+  }
+
+  function runBacktest(minuteMap, opts) {
+    // opts.capital is the MAX capital ever committed to a single position - if
+    // compounding has grown the running `capital` past it, position sizing
+    // still caps buying power at maxCapital; the surplus just sits uninvested.
+    var maxCapital = opts.capital;
+    var capital = opts.capital, capitalStart = opts.capital;
+    var buyPct = opts.buyPct, sellPct = opts.sellPct, mode = opts.mode;
+    var stopLossPct = opts.stopLossPct, confirmBars = opts.confirmBars,
+        confirmRecoveryPct = opts.confirmRecoveryPct, maxGapPct = opts.maxGapPct, confirmRetest = opts.confirmRetest;
+    var confirmEnabled = !!(confirmBars || confirmRecoveryPct || confirmRetest);
+
+    var dates = Object.keys(minuteMap).sort();
+    var trades = [];
+    var holding = false;
+    var buyPrice = null, buyDate = null, buyHHMM = null, sellTrigger = null, stopTrigger = null;
+    var prevClose = null;
+
+    for (var di = 0; di < dates.length; di++) {
+      var date = dates[di];
+      var day = minuteMap[date];
+      var dayOpen = day[0].open;
+      var buyTrigger = dayOpen * (1 + buyPct / 100); // buyPct is signed (e.g. -1 = -1%)
+      var enteredToday = false, exitedToday = false;
+
+      var gapPct = (prevClose !== null) ? (dayOpen - prevClose) / prevClose * 100 : null;
+      var skipToday = (!holding && maxGapPct !== null && gapPct !== null && gapPct > maxGapPct);
+      prevClose = day[day.length - 1].close;
+
+      if (skipToday) {
+        trades.push({ date: date, traded: false, note: '開盤跳空 +' + gapPct.toFixed(2) + '%,超過門檻不追,今天不進場' });
+        continue;
+      }
+
+      var awaitingConfirm = false, confirmStreak = 0, lastWatchPrice = null, watchLow = null;
+
+      for (var ri = 0; ri < day.length; ri++) {
+        var row = day[ri];
+        var price = row.close;
+
+        if (!holding && !awaitingConfirm && price <= buyTrigger) {
+          if (confirmEnabled) {
+            awaitingConfirm = true; confirmStreak = 0; lastWatchPrice = price; watchLow = price;
+            continue;
+          }
+          holding = true; enteredToday = true;
+          buyPrice = price; buyDate = date; buyHHMM = row.hhmm;
+          sellTrigger = dayOpen * (1 + sellPct / 100);
+          stopTrigger = stopLossPct ? buyPrice * (1 - stopLossPct / 100) : null;
+          continue;
+        }
+
+        if (awaitingConfirm && !holding) {
+          watchLow = Math.min(watchLow, price);
+          confirmStreak = price > lastWatchPrice ? confirmStreak + 1 : 0;
+          lastWatchPrice = price;
+
+          var barsOk = confirmBars && confirmStreak >= confirmBars;
+          var recoveryOk = confirmRecoveryPct && price >= watchLow * (1 + confirmRecoveryPct / 100);
+          var retestOk = confirmRetest && price >= buyTrigger;
+
+          if (barsOk || recoveryOk || retestOk) {
+            awaitingConfirm = false; holding = true; enteredToday = true;
+            buyPrice = price; buyDate = date; buyHHMM = row.hhmm;
+            sellTrigger = dayOpen * (1 + sellPct / 100);
+            stopTrigger = stopLossPct ? buyPrice * (1 - stopLossPct / 100) : null;
+          }
+          continue;
+        }
+
+        if (holding && stopTrigger !== null && price <= stopTrigger) {
+          var r1 = btSettleTrade(Math.min(capital, maxCapital), buyPrice, price, buyDate, date);
+          holding = false; exitedToday = true;
+          if (r1 === null) { trades.push({ date: buyDate, traded: false, note: '資金不足買1張' }); break; }
+          capital += r1.net;
+          trades.push({
+            date: buyDate, traded: true, lots: r1.lots, buyTime: buyHHMM, buyPrice: buyPrice,
+            sellDate: date, sellTime: row.hhmm, sellPrice: price, reason: 'stop_loss',
+            netProfit: Math.round(r1.net), capitalAfter: Math.round(capital)
+          });
+          break;
+        }
+
+        if (holding && price >= sellTrigger) {
+          var r2 = btSettleTrade(Math.min(capital, maxCapital), buyPrice, price, buyDate, date);
+          holding = false; exitedToday = true;
+          if (r2 === null) { trades.push({ date: buyDate, traded: false, note: '資金不足買1張' }); break; }
+          capital += r2.net;
+          trades.push({
+            date: buyDate, traded: true, lots: r2.lots, buyTime: buyHHMM, buyPrice: buyPrice,
+            sellDate: date, sellTime: row.hhmm, sellPrice: price, reason: 'target',
+            netProfit: Math.round(r2.net), capitalAfter: Math.round(capital)
+          });
+          break;
+        }
+      }
+
+      if (mode === 'forced_exit' && holding && enteredToday) {
+        var lastRow = day[day.length - 1];
+        var price3 = lastRow.close;
+        var r3 = btSettleTrade(Math.min(capital, maxCapital), buyPrice, price3, buyDate, date);
+        holding = false; exitedToday = true;
+        if (r3 === null) {
+          trades.push({ date: buyDate, traded: false, note: '資金不足買1張' });
+        } else {
+          capital += r3.net;
+          trades.push({
+            date: buyDate, traded: true, lots: r3.lots, buyTime: buyHHMM, buyPrice: buyPrice,
+            sellDate: date, sellTime: lastRow.hhmm, sellPrice: price3, reason: 'forced_close',
+            netProfit: Math.round(r3.net), capitalAfter: Math.round(capital)
+          });
+        }
+      }
+
+      if (!enteredToday && !exitedToday && !holding) {
+        trades.push({ date: date, traded: false });
+      }
+    }
+
+    if (holding) {
+      trades.push({ date: buyDate, traded: false, note: '持股到資料結尾仍未賣出(未實現)' });
+    }
+
+    return { trades: trades, finalCapital: capital, startCapital: capitalStart };
+  }
+
+  // Control group: simple buy-and-hold over the same minute-data date range -
+  // buy at the first day's open, sell at the last day's close, one lot-sized
+  // position sized off the same maxCapital cap, same fee/tax rates (multi-day
+  // hold, so the normal 0.3% sell tax rate applies, not the day-trade rate).
+  function runBuyHoldBenchmark(minuteMap, capital) {
+    var dates = Object.keys(minuteMap).sort();
+    if (!dates.length) return null;
+    var firstDay = minuteMap[dates[0]];
+    var lastDay = minuteMap[dates[dates.length - 1]];
+    var buyDate = dates[0], sellDate = dates[dates.length - 1];
+    var buyPrice = firstDay[0].open;
+    var sellPrice = lastDay[lastDay.length - 1].close;
+    var result = btSettleTrade(capital, buyPrice, sellPrice, buyDate, sellDate);
+    if (!result) return null;
+    return {
+      buyDate: buyDate, buyPrice: buyPrice, sellDate: sellDate, sellPrice: sellPrice,
+      lots: result.lots, netProfit: Math.round(result.net),
+      finalCapital: Math.round(capital + result.net), startCapital: capital
+    };
+  }
+
+  function renderBenchmark(minuteMap, capital) {
+    var headerEl = document.getElementById('btBenchmarkHeader');
+    var el2 = document.getElementById('btBenchmark');
+    var bh = runBuyHoldBenchmark(minuteMap, capital);
+    headerEl.style.display = '';
+    if (!bh) {
+      el2.className = 'bt-hint';
+      el2.textContent = '資金不足買 1 張,無法計算對照組';
+      return;
+    }
+    var returnPct = bh.startCapital ? bh.netProfit / bh.startCapital * 100 : NaN;
+    el2.className = 'stats bt-summary';
+    el2.innerHTML =
+      '<div class="stat"><span class="label">起始日('+ bh.buyDate + ')</span><span class="value">' + fmt(bh.buyPrice, 2) + '</span></div>' +
+      '<div class="stat"><span class="label">最後日('+ bh.sellDate + ')</span><span class="value">' + fmt(bh.sellPrice, 2) + '</span></div>' +
+      '<div class="stat"><span class="label">損益</span><span class="value ' + signClass(bh.netProfit) + '">' + fmtInt(bh.netProfit) + ' 元</span></div>' +
+      '<div class="stat"><span class="label">期末資金</span><span class="value">' + fmtInt(bh.finalCapital) + ' 元</span></div>' +
+      '<div class="stat"><span class="label">報酬率</span><span class="value ' + signClass(returnPct) + '">' + pct(returnPct) + '</span></div>';
+  }
+
+  function btReasonLabel(r) {
+    return { target: '達標', stop_loss: '停損', forced_close: '強制平倉' }[r] || '';
+  }
+
+  function renderBacktestResult(result) {
+    var trades = result.trades, startCapital = result.startCapital, finalCapital = result.finalCapital;
+    var executed = trades.filter(function (t) { return t.traded; });
+    var noTradeDays = trades.filter(function (t) { return !t.traded; });
+    var totalProfit = finalCapital - startCapital;
+    var returnPct = startCapital ? totalProfit / startCapital * 100 : NaN;
+
+    var summaryEl = document.getElementById('btSummary');
+    summaryEl.className = 'stats bt-summary';
+    summaryEl.innerHTML =
+      '<div class="stat"><span class="label">完成交易筆數</span><span class="value">' + executed.length + '</span></div>' +
+      '<div class="stat"><span class="label">未進場/未平倉天數</span><span class="value">' + noTradeDays.length + '</span></div>' +
+      '<div class="stat"><span class="label">總損益</span><span class="value ' + signClass(totalProfit) + '">' + fmtInt(totalProfit) + ' 元</span></div>' +
+      '<div class="stat"><span class="label">期末資金</span><span class="value">' + fmtInt(finalCapital) + ' 元</span></div>' +
+      '<div class="stat"><span class="label">報酬率</span><span class="value ' + signClass(returnPct) + '">' + pct(returnPct) + '</span></div>';
+
+    var body = document.getElementById('btTableBody');
+    var html = '';
+    for (var i = 0; i < executed.length; i++) {
+      var t = executed[i];
+      var heldOver = t.date !== t.sellDate;
+      var cumulative = Math.round(t.capitalAfter - startCapital);
+      html += '<tr>' +
+        '<td class="date-cell">' + t.date + '</td><td>' + hhmmLabel(t.buyTime) + '</td><td>' + fmt(t.buyPrice, 2) + '</td>' +
+        '<td class="date-cell">' + t.sellDate + '</td><td>' + hhmmLabel(t.sellTime) + '</td><td>' + fmt(t.sellPrice, 2) + '</td>' +
+        '<td>' + t.lots + '</td>' +
+        '<td class="' + signClass(t.netProfit) + '">' + fmtInt(t.netProfit) + '</td>' +
+        '<td class="' + signClass(cumulative) + '">' + fmtInt(cumulative) + '</td>' +
+        '<td>' + (heldOver ? '是' : '') + '</td>' +
+        '<td>' + btReasonLabel(t.reason) + '</td>' +
+        '</tr>';
+    }
+    body.innerHTML = html;
+    document.getElementById('btTableWrap').style.display = executed.length ? '' : 'none';
+
+    var notesEl = document.getElementById('btNotes');
+    var noteLines = noTradeDays.filter(function (t) { return t.note; }).map(function (t) { return t.date + ':' + t.note; });
+    notesEl.innerHTML = noteLines.length ? noteLines.map(function (l) { return '<div>' + l + '</div>'; }).join('')
+      : (executed.length ? '' : '<div>沒有符合條件的交易</div>');
+  }
+
+  // Flattens the backtested date range's minute bars into one chronological
+  // series (day boundaries collapsed to consecutive indices, same convention
+  // as the daily chart's trading-day slots - real elapsed time between bars
+  // isn't represented, only bar order), then plots the close-price line with
+  // buy/sell triangle markers at the trades' actual bar positions.
+  function renderBacktestChart(rangeMap, trades) {
+    var wrap = document.getElementById('btChartWrap');
+    var legend = document.getElementById('btChartLegend');
+    var dates = Object.keys(rangeMap).sort();
+    var flatRows = [];
+    dates.forEach(function (d) {
+      rangeMap[d].forEach(function (r) { flatRows.push({ date: d, hhmm: r.hhmm, close: r.close }); });
+    });
+    if (!flatRows.length) {
+      wrap.style.display = 'none'; legend.style.display = 'none';
+      state.btChartFlatRows = null; state.btChartTrades = null;
+      return;
+    }
+    wrap.style.display = ''; legend.style.display = '';
+    // Cached so density switches / scroll-driven Y-rescale can redraw
+    // without recomputing the backtest or re-flattening rangeMap.
+    state.btChartFlatRows = flatRows; state.btChartTrades = trades;
+    document.getElementById('btChartScroll').scrollLeft = 0;
+    drawBacktestChart();
+  }
+
+  // Draws just the price labels into the fixed (non-scrolling) overlay SVG.
+  // Uses the exact same y(v) formula as the main chart (padT/plotH/H all
+  // passed through unchanged) so a gridline in the main chart and its label
+  // here land on the same pixel row once both SVGs are stretched to the
+  // same rendered height.
+  function drawBacktestYAxis(yAxisSvg, yMin, yMax, padT, plotH, H) {
+    yAxisSvg.setAttribute('viewBox', '0 0 54 ' + H);
+    yAxisSvg.innerHTML = '';
+    var steps = 4;
+    for (var s = 0; s <= steps; s++) {
+      var v = yMin + (yMax - yMin) * (s / steps);
+      var yy = padT + (1 - s / steps) * plotH;
+      var t = el('text', { x: 46, y: yy + 3.5, 'text-anchor': 'end', class: 'axis-label' });
+      t.textContent = v.toFixed(1);
+      yAxisSvg.appendChild(t);
+    }
+  }
+
+  // Y-axis price range comes from whichever rows are actually visible in
+  // the scroll container right now (in 'fit' mode that's always everything);
+  // X positions always come from the FULL flatRows array so panning doesn't
+  // reflow the horizontal layout, only rescales the vertical one.
+  function drawBacktestChart() {
+    var flatRows = state.btChartFlatRows, trades = state.btChartTrades;
+    if (!flatRows) return;
+
+    var svg = document.getElementById('btChart');
+    svg.innerHTML = '';
+    var n = flatRows.length;
+    // padL === the fixed #btChartYAxis overlay's CSS width (keep these two
+    // in sync). The overlay always covers the leftmost Y_AXIS_WIDTH px of
+    // whatever's currently scrolled into view, so reserving exactly that
+    // much empty margin at the very start of the content (once, not per
+    // day) means the covered strip only ever lands on that empty margin
+    // (first screen) or on content already shown on the previous screen
+    // (every subsequent screen, scrolling by exact day-width multiples) -
+    // never on new data, which is what let a "1天" view get cut off before.
+    var Y_AXIS_WIDTH = 54;
+    var H = 260, padL = Y_AXIS_WIDTH, padR = 8, padT = 10, padB = 22;
+
+    // Distinct trading days, in order, plus each row's (dayIndex, localIndex
+    // within that day, bars in that day) - needed to lay every day out at
+    // EQUAL width regardless of how many bars it actually has (a stock
+    // doesn't trade every single minute, so bar counts vary a lot day to
+    // day - 139 to 265 bars/day isn't unusual - and sizing purely by bar
+    // count made busier days visibly wider than quiet ones).
+    var seenDates = [];
+    var barsPerDay = {};
+    flatRows.forEach(function (r) {
+      if (!(r.date in barsPerDay)) { seenDates.push(r.date); barsPerDay[r.date] = 0; }
+      barsPerDay[r.date]++;
+    });
+    var dayIndexByDate = {};
+    seenDates.forEach(function (d, di) { dayIndexByDate[d] = di; });
+
+    var firstIndexOfDate = {};
+    var dayIndexOf = new Array(n), localIndexOf = new Array(n);
+    var runningLocalIndex = {};
+    flatRows.forEach(function (r, i) {
+      var li = runningLocalIndex[r.date] || 0;
+      dayIndexOf[i] = dayIndexByDate[r.date];
+      localIndexOf[i] = li;
+      if (!(r.date in firstIndexOfDate)) firstIndexOfDate[r.date] = i;
+      runningLocalIndex[r.date] = li + 1;
+    });
+    var dayCount = seenDates.length;
+
+    // 'fit' squeezes every day into one screen-width chart (like before);
+    // a numeric density means "show this many trading days per screen",
+    // and since every day is now a fixed width, that's now an exact
+    // calculation (not an average-bars-per-day approximation). If the full
+    // range is wider than N days, .bt-chart-scroll (overflow-x:auto) lets
+    // you scroll further at that same density instead of squashing
+    // everything into illegibility.
+    var density = state.btChartDensity;
+    var W;
+    if (density === 'fit') {
+      W = 880;
+    } else {
+      var scrollEl = document.getElementById('btChartScroll');
+      var availW = scrollEl.clientWidth || 880;
+      var daysToShow = Math.min(Number(density), dayCount);
+      // Subtract Y_AXIS_WIDTH first - that strip is permanently covered by
+      // the overlay, so it's not usable plotting space; sizing off the full
+      // availW would make a day's slot wider than what's actually visible,
+      // cutting off its tail end until you scroll a bit further.
+      var dayWidthPx = (availW - Y_AXIS_WIDTH) / daysToShow;
+      W = Math.max(880, dayWidthPx * dayCount + padL + padR);
+    }
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    if (density === 'fit') {
+      svg.classList.remove('is-scaled');
+      svg.style.width = ''; svg.style.height = '';
+    } else {
+      svg.classList.add('is-scaled');
+      svg.style.width = W + 'px'; svg.style.height = H + 'px';
+    }
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var dayWidth = plotW / dayCount;
+
+    // Y-axis price range comes from whichever DAYS are actually visible in
+    // the scroll container right now (in 'fit' mode that's always
+    // everything) - mapped by day slot, not by a bar-index fraction, since
+    // day widths are now equal but bar density within them isn't.
+    var visibleRows = flatRows;
+    if (density !== 'fit') {
+      var scrollEl = document.getElementById('btChartScroll');
+      var startPx = scrollEl.scrollLeft, endPx = scrollEl.scrollLeft + scrollEl.clientWidth;
+      var startDay = Math.max(0, Math.min(dayCount - 1, Math.floor((startPx - padL) / dayWidth)));
+      var endDay = Math.max(0, Math.min(dayCount - 1, Math.floor((endPx - padL) / dayWidth)));
+      var startIdx = firstIndexOfDate[seenDates[startDay]];
+      var endDate = seenDates[endDay];
+      var endIdx = firstIndexOfDate[endDate] + barsPerDay[endDate];
+      var slice = flatRows.slice(startIdx, endIdx);
+      if (slice.length) visibleRows = slice;
+    }
+    var closes = visibleRows.map(function (r) { return r.close; });
+    var yMax = Math.max.apply(null, closes), yMin = Math.min.apply(null, closes);
+    var pad = (yMax - yMin) * 0.1 || Math.max(0.5, yMax * 0.01);
+    yMax += pad; yMin -= pad;
+
+    // Bar i sits at a fixed fractional position within its OWN day's equal-
+    // width slot (centered in a 1/barsInDay share of that slot), not at a
+    // fixed fraction of the whole series - that's what makes every day the
+    // same width on screen.
+    function x(i) {
+      var d = flatRows[i].date;
+      var barsInDay = barsPerDay[d];
+      var dayStart = padL + dayIndexOf[i] * dayWidth;
+      return dayStart + ((localIndexOf[i] + 0.5) / barsInDay) * dayWidth;
+    }
+    function y(v) { return padT + (1 - (v - yMin) / (yMax - yMin)) * plotH; }
+
+    var indexByKey = {};
+    flatRows.forEach(function (r, i) { indexByKey[r.date + '|' + r.hhmm] = i; });
+
+    // Horizontal gridlines only - the price labels for them are drawn into
+    // the separate, non-scrolling #btChartYAxis overlay below, so they stay
+    // pinned to the left edge of the viewport instead of scrolling away
+    // with the rest of the chart.
+    var steps = 4;
+    for (var s = 0; s <= steps; s++) {
+      var v = yMin + (yMax - yMin) * (s / steps);
+      var yy = y(v);
+      svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: yy, y2: yy, class: 'gridline' }));
+    }
+    svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: padT + plotH, y2: padT + plotH, class: 'baseline' }));
+
+    // Sync the non-scrolling y-axis overlay's rendered height to match this
+    // chart's actual rendered height (varies by container width in 'fit'
+    // mode; fixed at H px in scaled/scroll modes) so both SVGs' 0..H
+    // viewBox systems map to the same final pixel height and their
+    // gridlines/labels line up exactly.
+    var yAxisSvg = document.getElementById('btChartYAxis');
+    yAxisSvg.style.height = (svg.getBoundingClientRect().height || H) + 'px';
+    drawBacktestYAxis(yAxisSvg, yMin, yMax, padT, plotH, H);
+
+    // dashed vertical divider at the exact boundary between each pair of
+    // adjacent equal-width day slots (skip the very first edge - there's
+    // nothing to divide it from)
+    for (var dj = 1; dj < dayCount; dj++) {
+      var dividerX = padL + dj * dayWidth;
+      svg.appendChild(el('line', { x1: dividerX, x2: dividerX, y1: padT, y2: padT + plotH, class: 'day-divider' }));
+    }
+
+    // one x-axis label per distinct trading day, sparsely sampled, "m-d"
+    // (no leading zeros, no year - firstIndexOfDate / seenDates built above)
+    function mdLabel(dateStr) {
+      var parts = dateStr.split('-');
+      return parseInt(parts[1], 10) + '-' + parseInt(parts[2], 10);
+    }
+    var labelCount = Math.min(seenDates.length, Math.max(8, Math.floor(W / 90)));
+    for (var li = 0; li < labelCount; li++) {
+      var di = Math.round((li / Math.max(1, labelCount - 1)) * (seenDates.length - 1));
+      var idx = firstIndexOfDate[seenDates[di]];
+      var lbl = el('text', {
+        x: x(idx), y: H - 6,
+        'text-anchor': li === 0 ? 'start' : (li === labelCount - 1 ? 'end' : 'middle'),
+        class: 'axis-label'
+      });
+      lbl.textContent = mdLabel(seenDates[di]);
+      svg.appendChild(lbl);
+    }
+
+    var pts = flatRows.map(function (r, i) { return x(i) + ',' + y(r.close); });
+    svg.appendChild(el('path', {
+      d: 'M ' + pts.join(' L '), fill: 'none',
+      style: 'stroke:var(--accent);stroke-width:1.2'
+    }));
+
+    trades.forEach(function (t) {
+      if (!t.traded) return;
+      var buyIdx = indexByKey[t.date + '|' + t.buyTime];
+      if (buyIdx !== undefined) {
+        var bx = x(buyIdx), by = y(t.buyPrice);
+        var buyTri = el('path', {
+          d: 'M ' + bx + ',' + (by + 6) + ' L ' + (bx - 5) + ',' + (by + 15) + ' L ' + (bx + 5) + ',' + (by + 15) + ' Z',
+          style: 'fill:var(--up)'
+        });
+        var buyTitle = document.createElementNS(NS, 'title');
+        buyTitle.textContent = '買進 ' + t.date + ' ' + hhmmLabel(t.buyTime) + ' @ ' + fmt(t.buyPrice, 2);
+        buyTri.appendChild(buyTitle);
+        svg.appendChild(buyTri);
+      }
+      var sellIdx = indexByKey[t.sellDate + '|' + t.sellTime];
+      if (sellIdx !== undefined) {
+        var sx = x(sellIdx), sy = y(t.sellPrice);
+        var sellTri = el('path', {
+          d: 'M ' + sx + ',' + (sy - 6) + ' L ' + (sx - 5) + ',' + (sy - 15) + ' L ' + (sx + 5) + ',' + (sy - 15) + ' Z',
+          style: 'fill:var(--down)'
+        });
+        var sellTitle = document.createElementNS(NS, 'title');
+        sellTitle.textContent = '賣出 ' + t.sellDate + ' ' + hhmmLabel(t.sellTime) + ' @ ' + fmt(t.sellPrice, 2);
+        sellTri.appendChild(sellTitle);
+        svg.appendChild(sellTri);
+      }
+    });
+  }
+
+  function parseCapitalInput(str) {
+    return parseFloat(String(str).replace(/,/g, ''));
+  }
+
+  function initBacktest() {
+    var typeSel = document.getElementById('btConfirmType');
+    var valWrap = document.getElementById('btConfirmValueWrap');
+    var valLabel = document.getElementById('btConfirmValueLabel');
+    var valInput = document.getElementById('btConfirmValue');
+
+    // Same increment/decrement mechanism as 買進%/賣出% (native <input type="number">
+    // spin arrows) while focused/editing; switches back to a comma-formatted text
+    // display once blurred, since type="number" can't render thousands separators.
+    var capitalInput = document.getElementById('btCapital');
+    capitalInput.addEventListener('focus', function () {
+      var n = parseCapitalInput(capitalInput.value);
+      capitalInput.type = 'number';
+      capitalInput.step = '100000';
+      capitalInput.value = Number.isNaN(n) ? '' : n;
+    });
+    capitalInput.addEventListener('blur', function () {
+      var n = parseFloat(capitalInput.value);
+      capitalInput.type = 'text';
+      capitalInput.value = Number.isNaN(n) ? '' : n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    });
+
+    function syncConfirmValueField() {
+      var v = typeSel.value;
+      if (v === 'bars') {
+        valWrap.style.display = ''; valLabel.textContent = '連續上漲根數';
+        valInput.step = '1'; if (!valInput.value) valInput.value = '2';
+      } else if (v === 'recovery') {
+        valWrap.style.display = ''; valLabel.textContent = '反彈%';
+        valInput.step = '0.1'; if (!valInput.value) valInput.value = '0.3';
+      } else {
+        valWrap.style.display = 'none';
+      }
+    }
+    typeSel.addEventListener('change', syncConfirmValueField);
+    syncConfirmValueField();
+
+    var runBtn = document.getElementById('btRun');
+    var startInput = document.getElementById('btStartDate');
+    var endInput = document.getElementById('btEndDate');
+
+    function runNow() {
+      runBtn.disabled = true; runBtn.textContent = '計算中…';
+      loadMinuteData().then(function (map) {
+        var allDates = Object.keys(map).sort();
+        if (!allDates.length) throw new Error('output/' + state.stock + '_kbar.csv 沒有資料');
+        var dataMin = allDates[0], dataMax = allDates[allDates.length - 1];
+        startInput.min = dataMin; startInput.max = dataMax;
+        endInput.min = dataMin; endInput.max = dataMax;
+        if (!startInput.value) startInput.value = dataMin;
+        if (!endInput.value) endInput.value = dataMax;
+
+        var rangeMap = {};
+        allDates.forEach(function (d) {
+          if (d >= startInput.value && d <= endInput.value) rangeMap[d] = map[d];
+        });
+        if (!Object.keys(rangeMap).length) throw new Error('選擇的起訖日範圍內沒有分鐘資料');
+
+        var confirmType = typeSel.value;
+        var opts = {
+          buyPct: parseFloat(document.getElementById('btBuyPct').value) || 0,
+          sellPct: parseFloat(document.getElementById('btSellPct').value) || 0,
+          capital: parseCapitalInput(document.getElementById('btCapital').value) || 0,
+          mode: document.getElementById('btMode').value,
+          stopLossPct: document.getElementById('btStopLoss').value !== '' ? parseFloat(document.getElementById('btStopLoss').value) : null,
+          maxGapPct: document.getElementById('btMaxGap').value !== '' ? parseFloat(document.getElementById('btMaxGap').value) : null,
+          confirmBars: confirmType === 'bars' ? (parseInt(valInput.value, 10) || null) : null,
+          confirmRecoveryPct: confirmType === 'recovery' ? (parseFloat(valInput.value) || null) : null,
+          confirmRetest: confirmType === 'retest'
+        };
+        var result = runBacktest(rangeMap, opts);
+        renderBacktestResult(result);
+        renderBenchmark(rangeMap, opts.capital);
+        renderBacktestChart(rangeMap, result.trades);
+      }).catch(function (err) {
+        document.getElementById('btSummary').className = 'bt-hint';
+        document.getElementById('btSummary').textContent = '讀取 output/' + state.stock + '_kbar.csv 失敗:' + err;
+        document.getElementById('btTableWrap').style.display = 'none';
+        document.getElementById('btNotes').innerHTML = '';
+        document.getElementById('btBenchmarkHeader').style.display = 'none';
+        document.getElementById('btBenchmark').innerHTML = '';
+        document.getElementById('btChartWrap').style.display = 'none';
+        document.getElementById('btChartLegend').style.display = 'none';
+      }).then(function () {
+        runBtn.disabled = false; runBtn.textContent = '執行回測';
+      });
+    }
+    // The backtest only ever runs when the user clicks 執行回測 themselves -
+    // never automatically on page load, tab switch, or stock switch.
+    runBtn.addEventListener('click', runNow);
+  }
+
+  function initModal() {
+    document.getElementById('tableBody').addEventListener('click', function (e) {
+      var tr = e.target.closest('tr');
+      if (!tr) return;
+      var date = tr.getAttribute('data-date');
+      if (date) openDayModal(date);
+    });
+    document.getElementById('modalClose').addEventListener('click', closeDayModal);
+    document.getElementById('modalBackdrop').addEventListener('click', function (e) {
+      if (e.target.id === 'modalBackdrop') closeDayModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDayModal();
+    });
+  }
+
+  function render() {
+    var rows = filteredRows();
+    if (!rows.length) return;
+    document.getElementById('rangeHint').textContent =
+      rows[0].date + ' 至 ' + rows[rows.length - 1].date + '(共 ' + rows.length + ' 個交易日)';
+    renderStats(rows);
+    renderChart(rows);
+    renderTable(rows);
+  }
+
+  function initRangeButtons() {
+    var container = document.getElementById('rangeButtons');
+    var buttons = container.querySelectorAll('button');
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        buttons.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+        btn.setAttribute('aria-pressed', 'true');
+        state.rangeDays = parseInt(btn.getAttribute('data-range'), 10);
+        render();
+      });
+    });
+    buttons[0].setAttribute('aria-pressed', 'true');
+  }
+
+  // ---- Tabs: K 線圖表 / 策略試算 - pure show/hide, shared stock header above
+  // both, no data loading or calculation tied to switching tabs.
+
+  function initTabs() {
+    var buttons = document.querySelectorAll('.tab-btn');
+    var panels = { chart: document.getElementById('tabChart'), backtest: document.getElementById('tabBacktest') };
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var tab = btn.getAttribute('data-tab');
+        buttons.forEach(function (b) { b.setAttribute('aria-selected', b === btn ? 'true' : 'false'); });
+        Object.keys(panels).forEach(function (key) { panels[key].style.display = key === tab ? '' : 'none'; });
+      });
+    });
+  }
+
+  var DENSITY_STEPS = ['1', '2', '3', '5', '10', '15', '30', 'fit'];
+  var DENSITY_LABELS = ['1天', '2天', '3天', '5天', '10天', '15天', '30天', '全部'];
+
+  function initDensitySlider() {
+    var slider = document.getElementById('btDensitySlider');
+    var label = document.getElementById('btDensityLabel');
+    slider.addEventListener('input', function () {
+      var idx = parseInt(slider.value, 10);
+      state.btChartDensity = DENSITY_STEPS[idx];
+      label.textContent = DENSITY_LABELS[idx];
+      document.getElementById('btChartScroll').scrollLeft = 0;
+      if (state.btChartFlatRows) drawBacktestChart();
+    });
+  }
+
+  // While scrolled through a non-'fit' density chart, rescale the Y axis to
+  // whatever's currently in view (throttled to one redraw per animation
+  // frame - redrawing a several-thousand-point path on every scroll pixel
+  // would be wasteful and janky).
+  function initBtChartScroll() {
+    var scrollEl = document.getElementById('btChartScroll');
+    var pending = null;
+    scrollEl.addEventListener('scroll', function () {
+      if (state.btChartDensity === 'fit' || !state.btChartFlatRows) return;
+      if (pending) return;
+      pending = requestAnimationFrame(function () { pending = null; drawBacktestChart(); });
+    });
+  }
+
+  // ---- Multi-stock support: output/stocks_manifest.json (written by
+  // Get-DailyK-KGI.py / kbar.py whenever they save a file
+  // matching the {code}_daily.csv / {code}_kbar.csv naming convention) lists
+  // which stock codes have data available, so a dropdown can be shown when
+  // there's more than the one hardcoded default. ----
+
+  function loadStocksManifest() {
+    return fetch('output/stocks_manifest.json')
+      .then(function (res) { return res.ok ? res.json() : {}; })
+      .catch(function () { return {}; });
+  }
+
+  function updateHeader() {
+    var name = state.rows.length ? state.rows[0].name : '';
+    document.getElementById('stockName').textContent = name || state.stock;
+    document.getElementById('stockCode').textContent = state.stock;
+    document.title = (name ? name + ' ' : '') + state.stock;
+    document.getElementById('footerNote').textContent =
+      '資料來源:凱基證券 API(日K)· output/' + state.stock + '_daily.csv · 台股慣例:紅漲綠跌 · 點擊表格任一列可看當日分鐘走勢';
+    document.getElementById('btPanelHint').textContent =
+      '策略試算 · 逐分鐘回測,演算法與 Backtest-DipBuy.py 完全相同(output/' + state.stock + '_kbar.csv 全部區間)';
+  }
+
+  function loadStockData(code) {
+    return fetch('output/' + code + '_daily.csv')
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function (text) {
+        state.rows = parseCSV(text);
+        updateHeader();
+        render();
+      });
+  }
+
+  function setupStockSelector(codes) {
+    var select = document.getElementById('stockSelect');
+    if (!codes.length) return;
+    select.innerHTML = '';
+    codes.forEach(function (code) {
+      var opt = document.createElement('option');
+      opt.value = code; opt.textContent = code;
+      select.appendChild(opt);
+    });
+    select.value = state.stock;
+    select.style.display = '';
+    select.addEventListener('change', function () { switchStock(select.value); });
+  }
+
+  function resetBacktestUI() {
+    document.getElementById('btStartDate').value = '';
+    document.getElementById('btEndDate').value = '';
+    document.getElementById('btSummary').className = 'bt-hint';
+    document.getElementById('btSummary').textContent =
+      '尚未執行,調整參數後按「執行回測」(會載入 output/' + state.stock + '_kbar.csv)';
+    document.getElementById('btTableWrap').style.display = 'none';
+    document.getElementById('btTableBody').innerHTML = '';
+    document.getElementById('btNotes').innerHTML = '';
+    document.getElementById('btBenchmarkHeader').style.display = 'none';
+    document.getElementById('btBenchmark').innerHTML = '';
+    document.getElementById('btChartWrap').style.display = 'none';
+    document.getElementById('btChartLegend').style.display = 'none';
+    state.btChartFlatRows = null; state.btChartTrades = null;
+  }
+
+  function switchStock(code) {
+    if (!code || code === state.stock) return;
+    state.stock = code;
+    minuteCache = null;
+    closeDayModal();
+    resetBacktestUI(); // clears old results + date pickers - does NOT re-run; only 執行回測 runs it
+    document.getElementById('rangeHint').textContent = '載入中…';
+    loadStockData(code).catch(function (err) {
+      document.getElementById('rangeHint').textContent = '資料載入失敗:' + err;
+    });
+  }
+
+  loadStocksManifest()
+    .then(function (manifest) {
+      var codes = Object.keys(manifest).filter(function (c) {
+        return manifest[c] && manifest[c].daily;
+      }).sort();
+      if (codes.length) {
+        setupStockSelector(codes);
+        if (codes.indexOf(state.stock) === -1) state.stock = codes[0];
+      }
+      return loadStockData(state.stock);
+    })
+    .then(function () {
+      initRangeButtons();
+      initModal();
+      initBacktest();
+      initTabs();
+      initDensitySlider();
+      initBtChartScroll();
+      window.addEventListener('resize', render);
+    })
+    .catch(function (err) {
+      document.getElementById('rangeHint').textContent = '資料載入失敗:' + err + '(需透過 http:// 伺服器開啟,例如 Live Server,不能直接雙擊開檔案)';
+    });
+})();
+</script>
+
+</body>
+</html>

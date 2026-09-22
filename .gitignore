@@ -8,16 +8,11 @@ dll/
 
 # Generated data / output (reproducible via the scripts)
 output/
-
-# Credentials (never commit these)
-kgi.txt
-account.txt
-
-# Auto-downloaded by kgisuperpy on login, no useful content
+tmp/
+sdk/
+config.ini
+config.simulation.ini
 errMsg.ini
-
-# Personal working notes
-doc.txt
 
 # Session logs
 *.log

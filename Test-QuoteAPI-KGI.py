@@ -11,7 +11,7 @@ On a non-trading day/time, no price ticks will arrive (market closed), but a
 permission rejection (if any) should still show up as an event message.
 
 Credentials are resolved in this order: C:\Personal\KGI\kgi.txt (KEY=VALUE
-lines, see Get-MinuteKbars-KGI.py for the format) -> environment variables
+lines, see kbar.py for the format) -> environment variables
 (KGI_ID / KGI_PWD / KGI_ACCOUNT) -> interactive prompt.
 
 Usage:
