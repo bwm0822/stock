@@ -161,6 +161,10 @@
   .tooltip .t-row { display: flex; justify-content: space-between; gap: 14px; }
   .tooltip .t-row span:last-child { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 
+  /* Gray background + black label text (price/% spans keep their own
+     inline green/red color, which wins over this via inline specificity). */
+  #btChartTooltip { background: #d6d4cc; color: #1a1a1a; }
+
   .legend { display: flex; align-items: center; gap: 16px; padding: 0 16px 14px; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; }
   .legend .item { display: flex; align-items: center; gap: 6px; }
   .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
@@ -370,12 +374,14 @@
         <div class="bt-chart-scroll" id="btChartScroll">
           <svg class="chart" id="btChart" viewBox="0 0 880 260" preserveAspectRatio="none" role="img" aria-label="回測期間分鐘走勢圖,三角形標示買賣點"></svg>
         </div>
+        <div class="tooltip" id="btChartTooltip"></div>
       </div>
     </div>
     <div class="legend" id="btChartLegend" style="display:none">
       <span class="item"><span class="swatch line" style="background:var(--accent)"></span>收盤價</span>
-      <span class="item"><span class="swatch" style="background:var(--up)"></span>▲ 買進點</span>
-      <span class="item"><span class="swatch" style="background:var(--down)"></span>▼ 賣出點</span>
+      <span class="item"><span class="swatch" style="background:var(--down)"></span>▲ 買進點</span>
+      <span class="item"><span class="swatch" style="background:var(--up)"></span>▼ 賣出點</span>
+      <span class="item"><span class="swatch" style="background:var(--up); opacity:0.3; border:1px solid var(--up)"></span>方框 = 該筆交易持有區間(綠框 = 虧損)</span>
     </div>
 
     <div class="table-scroll" id="btTableWrap" style="display:none">
@@ -1144,7 +1150,7 @@
     var dates = Object.keys(rangeMap).sort();
     var flatRows = [];
     dates.forEach(function (d) {
-      rangeMap[d].forEach(function (r) { flatRows.push({ date: d, hhmm: r.hhmm, close: r.close }); });
+      rangeMap[d].forEach(function (r) { flatRows.push({ date: d, hhmm: r.hhmm, close: r.close, open: r.open }); });
     });
     if (!flatRows.length) {
       wrap.style.display = 'none'; legend.style.display = 'none';
@@ -1157,6 +1163,29 @@
     state.btChartFlatRows = flatRows; state.btChartTrades = trades;
     document.getElementById('btChartScroll').scrollLeft = 0;
     drawBacktestChart();
+  }
+
+  // Custom hover tooltip for trade-span boxes (buy line green, sell line
+  // red) - a native SVG <title> can't render per-line color, so this reuses
+  // the same div-tooltip pattern as the other charts on the page.
+  function showBtChartTooltip(evt, buyLine, sellLine) {
+    var area = document.getElementById('btChartArea');
+    var areaRect = area.getBoundingClientRect();
+    var clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+    var clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+    var tooltip = document.getElementById('btChartTooltip');
+    // buyLine/sellLine already carry their own <span style="color:..."> for
+    // the price/% portion - the date/time label stays the tooltip's default
+    // (white-on-dark) color, only the price+% is colored.
+    tooltip.innerHTML = '<div>' + buyLine + '</div><div>' + sellLine + '</div>';
+    tooltip.style.opacity = 1;
+    var left = clientX - areaRect.left;
+    var top = clientY - areaRect.top;
+    tooltip.style.left = clampedTooltipLeft(tooltip, left, areaRect.width) + 'px';
+    tooltip.style.top = top + 'px';
+  }
+  function hideBtChartTooltip() {
+    document.getElementById('btChartTooltip').style.opacity = 0;
   }
 
   // Draws just the price labels into the fixed (non-scrolling) overlay SVG.
@@ -1352,29 +1381,67 @@
     trades.forEach(function (t) {
       if (!t.traded) return;
       var buyIdx = indexByKey[t.date + '|' + t.buyTime];
-      if (buyIdx !== undefined) {
-        var bx = x(buyIdx), by = y(t.buyPrice);
-        var buyTri = el('path', {
-          d: 'M ' + bx + ',' + (by + 6) + ' L ' + (bx - 5) + ',' + (by + 15) + ' L ' + (bx + 5) + ',' + (by + 15) + ' Z',
-          style: 'fill:var(--up)'
-        });
-        var buyTitle = document.createElementNS(NS, 'title');
-        buyTitle.textContent = '買進 ' + t.date + ' ' + hhmmLabel(t.buyTime) + ' @ ' + fmt(t.buyPrice, 2);
-        buyTri.appendChild(buyTitle);
-        svg.appendChild(buyTri);
-      }
       var sellIdx = indexByKey[t.sellDate + '|' + t.sellTime];
-      if (sellIdx !== undefined) {
-        var sx = x(sellIdx), sy = y(t.sellPrice);
-        var sellTri = el('path', {
-          d: 'M ' + sx + ',' + (sy - 6) + ' L ' + (sx - 5) + ',' + (sy - 15) + ' L ' + (sx + 5) + ',' + (sy - 15) + ' Z',
-          style: 'fill:var(--down)'
+      if (buyIdx === undefined || sellIdx === undefined) return;
+
+      var bx = x(buyIdx), by = y(t.buyPrice);
+      var sx = x(sellIdx), sy = y(t.sellPrice);
+
+      // Semi-transparent box spanning the whole trade - from the buy point
+      // to the sell point, both in time (x) and price (y) - so the holding
+      // period and its price move are visible at a glance, not just the
+      // two endpoints. Colored by outcome (profit vs loss), same TW
+      // red-up/green-down convention as the rest of the chart.
+      var profited = t.sellPrice > t.buyPrice;
+      var boxColor = profited ? 'var(--up)' : 'var(--down)';
+      var boxX = Math.min(bx, sx), boxW = Math.max(2, Math.abs(sx - bx));
+      var boxY = Math.min(by, sy), boxH = Math.max(2, Math.abs(sy - by));
+      var tradeBox = el('rect', {
+        x: boxX, y: boxY, width: boxW, height: boxH,
+        style: 'fill:' + boxColor + ';fill-opacity:0.15;stroke:' + boxColor + ';stroke-width:1;stroke-opacity:0.5'
+      });
+      // % is each price's move from the BUY DAY's open (the same reference
+      // the strategy itself uses for both the buy and sell trigger, even
+      // when the sell lands on a later day - see runBacktest()).
+      var dayOpen = flatRows[firstIndexOfDate[t.date]].open;
+      var buyPct = dayOpen ? (t.buyPrice - dayOpen) / dayOpen * 100 : NaN;
+      var sellPct = dayOpen ? (t.sellPrice - dayOpen) / dayOpen * 100 : NaN;
+      // Native <title> tooltips can't render per-line color, so this uses
+      // the same custom div-tooltip mechanism as the other charts on this
+      // page (#btChartTooltip) instead - date/time label stays the
+      // tooltip's default color, price+% is colored (green for buy,
+      // red for sell), matching 買進點/賣出點's marker colors.
+      (function (buyLine, sellLine) {
+        tradeBox.addEventListener('mousemove', function (evt) {
+          showBtChartTooltip(evt, buyLine, sellLine);
         });
-        var sellTitle = document.createElementNS(NS, 'title');
-        sellTitle.textContent = '賣出 ' + t.sellDate + ' ' + hhmmLabel(t.sellTime) + ' @ ' + fmt(t.sellPrice, 2);
-        sellTri.appendChild(sellTitle);
-        svg.appendChild(sellTri);
-      }
+        tradeBox.addEventListener('mouseleave', hideBtChartTooltip);
+      })(
+        '買進 ' + t.date.slice(5) + ' ' + hhmmLabel(t.buyTime) + '  <span style="color:var(--down)">' + fmt(t.buyPrice, 2) + '  ' + pct(buyPct) + '</span>',
+        '賣出 ' + t.sellDate.slice(5) + ' ' + hhmmLabel(t.sellTime) + '  <span style="color:var(--up)">' + fmt(t.sellPrice, 2) + '  ' + pct(sellPct) + '</span>'
+      );
+      svg.appendChild(tradeBox);
+
+      // 買進點 = 綠色, 賣出點 = 紅色 (action color, deliberately independent
+      // of the --up/--down red-rises/green-falls price-direction convention
+      // used everywhere else on this page).
+      var buyTri = el('path', {
+        d: 'M ' + bx + ',' + (by + 6) + ' L ' + (bx - 5) + ',' + (by + 15) + ' L ' + (bx + 5) + ',' + (by + 15) + ' Z',
+        style: 'fill:var(--down)'
+      });
+      var buyTitle = document.createElementNS(NS, 'title');
+      buyTitle.textContent = '買進 ' + t.date + ' ' + hhmmLabel(t.buyTime) + ' @ ' + fmt(t.buyPrice, 2);
+      buyTri.appendChild(buyTitle);
+      svg.appendChild(buyTri);
+
+      var sellTri = el('path', {
+        d: 'M ' + sx + ',' + (sy - 6) + ' L ' + (sx - 5) + ',' + (sy - 15) + ' L ' + (sx + 5) + ',' + (sy - 15) + ' Z',
+        style: 'fill:var(--up)'
+      });
+      var sellTitle = document.createElementNS(NS, 'title');
+      sellTitle.textContent = '賣出 ' + t.sellDate + ' ' + hhmmLabel(t.sellTime) + ' @ ' + fmt(t.sellPrice, 2);
+      sellTri.appendChild(sellTitle);
+      svg.appendChild(sellTri);
     });
   }
 
